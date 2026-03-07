@@ -1,0 +1,25 @@
+{
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.executorMap": {
+        "cpp": "cd \"$workspaceRoot\" && mkdir -p build && clang++ -std=c++20 -g \"$file\" -o \"build/$fileBasenameNoExtension\" && \"./build/$fileBasenameNoExtension\""
+    },
+    "editor.suggestOnTriggerCharacters": true,
+    "editor.suggest.showKeywords": true,
+    "editor.suggest.filterGraceful": false,
+    "editor.suggestSelection": "recentlyUsedByPrefix",
+    "editor.wordBasedSuggestions": "off",
+    "editor.suggest.showWords": false,
+    "editor.inlineSuggest.enabled": false,
+    "editor.snippetSuggestions": "top",
+    "editor.suggest.localityBonus": true,
+    "editor.suggest.shareSuggestSelections": true,
+    "clangd.arguments": [
+        "--background-index"
+    ]
+}
