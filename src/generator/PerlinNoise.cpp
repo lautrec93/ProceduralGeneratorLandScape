@@ -1,0 +1,2 @@
+
+class PerlinNoise : public Noise {};
