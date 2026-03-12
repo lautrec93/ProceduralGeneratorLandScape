@@ -1,7 +1,10 @@
 #pragma once
+#include "HeightMapGenerator.hpp"
 
-#include <vector>
+class HeightMapRaw {
+private:
+  HeightMapGenerator heightMP;
 
-struct HeightMapRaw {
-  std::vector<std::vector<unsigned>> heightMapRawVect;
+public:
+  HeightMapRaw(const HeightMapGenerator &hMP) : heightMP(hMP) {};
 };
