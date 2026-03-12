@@ -73,7 +73,9 @@ void PerlinNoise::noise() {
       double interpx0 = dot00 + fadeU * (dot10 - dot00);
       double interpx1 = dot01 + fadeU * (dot11 - dot01);
 
-      double value = interpx0 + fadeV * (interpx1 - interpx0);
+      value = interpx0 + fadeV * (interpx1 - interpx0);
     }
   }
 }
+
+const double PerlinNoise::getValue() const { return value; }

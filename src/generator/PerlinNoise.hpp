@@ -8,9 +8,11 @@ class PerlinNoise : public Noise {
 private:
   HeightMapGenerator field2D;
   float scaleXY{}; // could be changed in the future
+  double value{};
 
 public:
   void noise() override;
+  const double getValue() const override;
   PerlinNoise(float scale, HeightMapGenerator &heightMap)
       : scaleXY(scale), field2D(heightMap) {}
 };
