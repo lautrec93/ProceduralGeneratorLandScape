@@ -1,3 +1,4 @@
+#include "PerlinNoise.hpp"
 #include "HeightMapRaw.hpp"
 #include "Noise.hpp"
 #include "Offsets.hpp"
