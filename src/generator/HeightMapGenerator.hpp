@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Noise.hpp"
 #include "TerrainConfig.hpp"
 #include <vector>
 
@@ -16,8 +17,9 @@ private:
 
 public:
   void fieldXYCreator();
-  double fractalBrownianMotion();
+  double fractalBrownianMotion(Noise &noiseFunc);
   const std::vector<std::vector<double>> &getFieldXY() const;
+  HeightMapGenerator &operator*=(double other);
 
   HeightMapGenerator(const TerrainConfig &config, unsigned x, unsigned y,
                      std::vector<std::vector<double>> field,

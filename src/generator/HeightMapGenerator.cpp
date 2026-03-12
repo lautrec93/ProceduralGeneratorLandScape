@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HeightMapGenerator.hpp"
+#include "Noise.hpp"
 #include "TerrainConfig.hpp"
 #include <vector>
 
@@ -14,11 +15,9 @@ void HeightMapGenerator::fieldXYCreator() {
   }
 }
 
-double HeightMapGenerator::fractalBrownianMotion() {
+double HeightMapGenerator::fractalBrownianMotion(Noise &noiseFunc) {
   for (int i = 0; i < terrainConfig.octaveNumber; i++) {
-    for (; itera != fieldXY.end(); ++itera) {
-      *itera = amplitude * noise();
-    }
+    amplitude *= noiseFunc.getValue();
     amplitude *= std::pow(terrainConfig.persistence, i);
     frequency *= std::pow(terrainConfig.lacunarity, i);
   }
@@ -26,4 +25,14 @@ double HeightMapGenerator::fractalBrownianMotion() {
 
 const std::vector<std::vector<double>> &HeightMapGenerator::getFieldXY() const {
   return fieldXY;
+}
+
+HeightMapGenerator &HeightMapGenerator::operator*=(double other) {
+  for (auto row{fieldXY.begin()}; row != fieldXY.end(); ++row) {
+    for (auto col{row->begin()}; col != row->end(); ++col) {
+      *col = amplitude * other;
+    }
+  }
+
+  return *this;
 }
