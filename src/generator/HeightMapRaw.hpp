@@ -7,4 +7,5 @@ private:
 
 public:
   HeightMapRaw(const HeightMapGenerator &hMP) : heightMP(hMP) {};
+  void showRawMap(HeightMapGenerator &heightMap);
 };
