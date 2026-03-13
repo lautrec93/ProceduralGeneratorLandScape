@@ -1,23 +1,24 @@
+#define XXH_INLINE_ALL
 #include "PerlinNoise.hpp"
 #include "Offsets.hpp"
 #include "xxhash.h"
 #include <vector>
 
-void PerlinNoise::noise() {
-  field2D.fieldXYCreator();
-  const auto &field = field2D.getFieldXY();
-
-  for (unsigned i{0}; i < field.size(); i++) {
-    for (unsigned j{0}; j < field[0].size(); j++) {
+void PerlinNoise::noise(unsigned nodes) {
+  auto &field = heightMap_pn.getFieldXY();
+  unsigned i{0};
+  unsigned j{0};
+  for (i; i < field.size(); i++) {
+    for (j; j < field[0].size(); j++) {
       double x = i * scaleXY;
       double y = j * scaleXY;
       double cellX = std::floor(x);
       double cellY = std::floor(y);
 
-      std::vector<Offsets> node00;
-      std::vector<Offsets> node01;
-      std::vector<Offsets> node10;
-      std::vector<Offsets> node11;
+      std::vector<Offsets> node00{};
+      std::vector<Offsets> node01{};
+      std::vector<Offsets> node10{};
+      std::vector<Offsets> node11{};
       node00.push_back({cellX, cellY});
       node10.push_back({cellX + 1, cellY});
       node01.push_back({cellX, cellY + 1});
@@ -37,19 +38,19 @@ void PerlinNoise::noise() {
       unsigned index01 = hash01 & 7;
       unsigned index11 = hash11 & 7;
 
-      std::vector<Offsets> grad00;
-      std::vector<Offsets> grad01;
-      std::vector<Offsets> grad10;
-      std::vector<Offsets> grad11;
+      std::vector<Offsets> grad00{};
+      std::vector<Offsets> grad01{};
+      std::vector<Offsets> grad10{};
+      std::vector<Offsets> grad11{};
       grad00.push_back(offsets[index00]);
       grad10.push_back(offsets[index10]);
       grad01.push_back(offsets[index01]);
       grad11.push_back(offsets[index11]);
 
-      std::vector<Offsets> dir00;
-      std::vector<Offsets> dir01;
-      std::vector<Offsets> dir10;
-      std::vector<Offsets> dir11;
+      std::vector<Offsets> dir00{};
+      std::vector<Offsets> dir01{};
+      std::vector<Offsets> dir10{};
+      std::vector<Offsets> dir11{};
       dir00.push_back({x - cellX, y - cellY});
       dir10.push_back({x - cellX - 1, y - cellY});
       dir01.push_back({x - cellX, y - cellY - 1});
@@ -71,9 +72,8 @@ void PerlinNoise::noise() {
       double interpx0 = dot00 + fadeU * (dot10 - dot00);
       double interpx1 = dot01 + fadeU * (dot11 - dot01);
 
-      value = interpx0 + fadeV * (interpx1 - interpx0);
+      heightMap_pn.getFieldXY()[i][j] =
+          interpx0 + fadeV * (interpx1 - interpx0);
     }
   }
 }
-
-const double PerlinNoise::getValue() const { return value; }
