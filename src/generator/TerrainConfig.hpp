@@ -1,17 +1,17 @@
 #pragma once
 
 struct TerrainConfig {
-  unsigned seed;
-  unsigned size;
-  float cellSize;
+  unsigned seed{};
+  unsigned size{};
+  float cellSize{};
 
-  float noizeScale;
+  float noizeScale{};
 
-  unsigned octaveNumber;
-  float lacunarity;
-  float persistence;
+  unsigned octaveNumber{};
+  float lacunarity{};
+  float persistence{};
 
-  float maxHeight;
-  float minHeight;
-  float seaLevel;
+  float maxHeight{};
+  float minHeight{};
+  float seaLevel{};
 };
