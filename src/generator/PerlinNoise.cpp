@@ -4,12 +4,13 @@
 #include "xxhash.h"
 #include <vector>
 
-void PerlinNoise::noise(unsigned nodes) {
-  auto &field = heightMap_pn.getFieldXY();
+void PerlinNoise::noise(unsigned nodes,
+                        std::vector<std::vector<double>> &field) {
   unsigned i{0};
   unsigned j{0};
-  for (i; i < field.size(); i++) {
-    for (j; j < field[0].size(); j++) {
+  for (auto row{field.begin()}; row != field.end(); ++row) {
+    unsigned j = 0;
+    for (auto col{row->begin()}; col != row->end(); ++col) {
       double x = i * scaleXY;
       double y = j * scaleXY;
       double cellX = std::floor(x);
@@ -64,16 +65,18 @@ void PerlinNoise::noise(unsigned nodes) {
       double ptlocX = x - cellX;
       double ptlocY = y - cellY;
 
-      double fadeU = 6 * std::pow(ptlocX, 5) -
-                     15 * std::pow(ptlocX, 4) * std::pow(ptlocX, 3);
-      double fadeV = 6 * std::pow(ptlocY, 5) -
-                     15 * std::pow(ptlocY, 4) * std::pow(ptlocY, 3);
+      double fadeU = 6 * std::pow(ptlocX, 5) - 15 * std::pow(ptlocX, 4) -
+                     std::pow(ptlocX, 3);
+      double fadeV = 6 * std::pow(ptlocY, 5) - 15 * std::pow(ptlocY, 4) -
+                     std::pow(ptlocY, 3);
 
       double interpx0 = dot00 + fadeU * (dot10 - dot00);
       double interpx1 = dot01 + fadeU * (dot11 - dot01);
+      double value = interpx0 + fadeV * (interpx1 - interpx0);
 
-      heightMap_pn.getFieldXY()[i][j] =
-          interpx0 + fadeV * (interpx1 - interpx0);
+      field[i][j] = value;
+      ++j;
     }
+    ++i;
   }
 }
