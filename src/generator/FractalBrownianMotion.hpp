@@ -12,7 +12,7 @@ private:
   TerrainConfig tConf;
 
 public:
-  void fractalBrownianMotion(Noise &noiseFunc);
+  std::vector<std::vector<double>> fractalBrownianMotion(Noise &noiseFunc);
   FractalBrownianMotion(HeightMapGenerator &hMap, TerrainConfig &tConf)
       : hMap(hMap), tConf(tConf) {}
 };
