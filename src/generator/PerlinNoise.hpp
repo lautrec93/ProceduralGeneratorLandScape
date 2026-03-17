@@ -7,10 +7,18 @@
 class PerlinNoise : public Noise {
 private:
   HeightMapGenerator heightMap_pn;
-  double scaleXY{}; // could be changed in the future
+  double scaleXY{};
+  double value{};
+  double x{};
+  double y{};
 
 public:
-  void noise(unsigned nodes, std::vector<std::vector<double>> &field) override;
+  void noise(const NoiseParametres &params) override;
+  double getValue() const override;
+  double getX() const override;
+  double getY() const override;
+  void changeX(double number) override;
+  void changeY(double number) override;
   PerlinNoise(float scale, HeightMapGenerator &heightMap)
       : scaleXY(scale), heightMap_pn(heightMap) {}
 };

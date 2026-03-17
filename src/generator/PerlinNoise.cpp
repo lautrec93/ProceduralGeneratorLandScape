@@ -1,18 +1,18 @@
-#define XXH_INLINE_ALL
 #include "PerlinNoise.hpp"
+#include "HashFunc.hpp"
+#include "NoiseParametres.hpp"
 #include "Offsets.hpp"
 #include "xxhash.h"
 #include <vector>
 
-void PerlinNoise::noise(unsigned nodes,
-                        std::vector<std::vector<double>> &field) {
+void PerlinNoise::noise(const NoiseParametres &params) {
   unsigned i{0};
   unsigned j{0};
-  for (auto row{field.begin()}; row != field.end(); ++row) {
-    unsigned j = 0;
+  for (auto row{params.field.begin()}; row != params.field.end(); ++row) {
+    j = 0;
     for (auto col{row->begin()}; col != row->end(); ++col) {
-      double x = i * scaleXY;
-      double y = j * scaleXY;
+      x = i * scaleXY * params.freq.value_or(1.0);
+      y = j * scaleXY * params.freq.value_or(1.0);
       double cellX = std::floor(x);
       double cellY = std::floor(y);
 
@@ -25,19 +25,14 @@ void PerlinNoise::noise(unsigned nodes,
       node01.push_back({cellX, cellY + 1});
       node11.push_back({cellX + 1, cellY + 1});
 
-      unsigned hash00 =
-          XXH3_64bits(node00.data(), node00.size() * sizeof(Offsets));
-      unsigned hash10 =
-          XXH3_64bits(node10.data(), node10.size() * sizeof(Offsets));
-      unsigned hash01 =
-          XXH3_64bits(node01.data(), node01.size() * sizeof(Offsets));
-      unsigned hash11 =
-          XXH3_64bits(node11.data(), node11.size() * sizeof(Offsets));
-
-      unsigned index00 = hash00 & 7; // lenght of array offsets is 8
-      unsigned index10 = hash10 & 7;
-      unsigned index01 = hash01 & 7;
-      unsigned index11 = hash11 & 7;
+      unsigned index00 =
+          hashMurMurFin(node00[0].x, node00[0].y, params.terCon.seed) & 7;
+      unsigned index10 =
+          hashMurMurFin(node10[0].x, node10[0].y, params.terCon.seed) & 7;
+      unsigned index01 =
+          hashMurMurFin(node01[0].x, node01[0].y, params.terCon.seed) & 7;
+      unsigned index11 =
+          hashMurMurFin(node11[0].x, node11[0].y, params.terCon.seed) & 7;
 
       std::vector<Offsets> grad00{};
       std::vector<Offsets> grad01{};
@@ -65,18 +60,25 @@ void PerlinNoise::noise(unsigned nodes,
       double ptlocX = x - cellX;
       double ptlocY = y - cellY;
 
-      double fadeU = 6 * std::pow(ptlocX, 5) - 15 * std::pow(ptlocX, 4) -
-                     std::pow(ptlocX, 3);
-      double fadeV = 6 * std::pow(ptlocY, 5) - 15 * std::pow(ptlocY, 4) -
-                     std::pow(ptlocY, 3);
+      double fadeU = 6 * std::pow(ptlocX, 5) - 15 * std::pow(ptlocX, 4) +
+                     10 * std::pow(ptlocX, 3);
+      double fadeV = 6 * std::pow(ptlocY, 5) - 15 * std::pow(ptlocY, 4) +
+                     10 * std::pow(ptlocY, 3);
 
       double interpx0 = dot00 + fadeU * (dot10 - dot00);
       double interpx1 = dot01 + fadeU * (dot11 - dot01);
-      double value = interpx0 + fadeV * (interpx1 - interpx0);
+      value = interpx0 + fadeV * (interpx1 - interpx0);
 
-      field[i][j] = value;
+      params.field[i][j] = value;
       ++j;
     }
     ++i;
   }
 }
+
+double PerlinNoise::getValue() const { return value; };
+double PerlinNoise::getX() const { return x; };
+double PerlinNoise::getY() const { return y; };
+
+void PerlinNoise::changeX(double amp) { x *= amp; };
+void PerlinNoise::changeY(double amp) { y *= amp; };
