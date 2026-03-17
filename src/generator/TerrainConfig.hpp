@@ -1,7 +1,10 @@
 #pragma once
 
+#include <cstdint>
+#include <sys/types.h>
+
 struct TerrainConfig {
-  unsigned seed{};
+  uint32_t seed{};
   unsigned size{};
   float cellSize{};
 
