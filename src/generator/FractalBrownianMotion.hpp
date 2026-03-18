@@ -6,8 +6,8 @@
 
 class FractalBrownianMotion {
 private:
-  double baseAmplitude{1};
-  double baseFrequency{1};
+  double baseAmplitude{1.0};
+  double baseFrequency{0.01};
   HeightMapGenerator &hMap;
   TerrainConfig tConf;
 
