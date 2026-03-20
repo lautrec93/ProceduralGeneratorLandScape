@@ -6,11 +6,9 @@
 class HeightMapGenerator {
 private:
   TerrainConfig terrainConfig;
-  std::vector<std::vector<double>> fieldXY{};
 
 public:
-  void fieldXYCreator(unsigned numberOfNodes);
-  std::vector<std::vector<double>> &getFieldXY();
+  std::vector<std::vector<double>> fieldXYCreator(unsigned numberOfNodes);
 
-  HeightMapGenerator(TerrainConfig &config) : terrainConfig(config) {}
+  HeightMapGenerator(TerrainConfig config) : terrainConfig(config) {}
 };

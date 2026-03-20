@@ -1,12 +1,10 @@
 #pragma once
 
-#include "HeightMapGenerator.hpp"
 #include "Noise.hpp"
 #include "xxhash.h"
 
 class PerlinNoise : public Noise {
 private:
-  HeightMapGenerator heightMap_pn;
   double scaleXY{};
   double value{};
   double x{};
@@ -19,6 +17,5 @@ public:
   double getY() const override;
   void changeX(double number) override;
   void changeY(double number) override;
-  PerlinNoise(float scale, HeightMapGenerator &heightMap)
-      : scaleXY(scale), heightMap_pn(heightMap) {}
+  PerlinNoise(float scale) : scaleXY(scale) {}
 };

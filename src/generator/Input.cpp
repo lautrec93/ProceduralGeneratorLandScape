@@ -25,6 +25,12 @@ std::vector<TerrainConfig> Input::startInput() {
   std::cout << "Enter cell size \n";
   std::cin >> cellSize;
 
+  std::cout << "Enter basical amplitude \n";
+  std::cin >> baseAmplitude;
+
+  std::cout << "Enter basical frequency \n";
+  std::cin >> baseFrequency;
+
   std::cout << "Enter noizeScale \n";
   std::cin >> noizeScale;
 
@@ -33,6 +39,9 @@ std::vector<TerrainConfig> Input::startInput() {
 
   std::cout << "Enter persistence \n";
   std::cin >> persistence;
+
+  std::cout << "Enter coefficient \n";
+  std::cin >> coefficient;
 
   std::cout << "Enter number of octaves \n";
   std::cin >> octaveNumber;
@@ -59,9 +68,9 @@ std::vector<TerrainConfig> Input::startInput() {
   }
 
   std::vector<TerrainConfig> finalInput{};
-  finalInput.emplace_back(seed, size, cellSize, noizeScale, octaveNumber,
-                          lacunarity, persistence, maxHeight, minHeight,
-                          seaLevel);
+  finalInput.emplace_back(seed, size, cellSize, baseAmplitude, baseFrequency,
+                          noizeScale, coefficient, octaveNumber, lacunarity,
+                          persistence, maxHeight, minHeight, seaLevel);
 
   return finalInput;
 }

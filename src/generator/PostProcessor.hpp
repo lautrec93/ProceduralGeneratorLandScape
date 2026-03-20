@@ -1,17 +1,15 @@
 #pragma once
 
-#include "HeightMapFinContainer.hpp"
-#include <vector>
+#include "generator/HeightMapContainer.hpp"
 class PostProcessor {
 private:
-  HeightMapFinContainer<std::vector<std::vector<double>>> &finContainer;
+  HeightMapContainer &heightMapContainer;
 
 public:
   void normalizeFunction();
   void remapFunction(double k);
   void scalingFunction(double min, double max);
 
-  PostProcessor(
-      HeightMapFinContainer<std::vector<std::vector<double>>> &finContainer)
-      : finContainer(finContainer) {};
+  PostProcessor(HeightMapContainer &heightMapContainer)
+      : heightMapContainer(heightMapContainer) {};
 };

@@ -1,18 +1,18 @@
 #pragma once
 
-#include "HeightMapGenerator.hpp"
 #include "Noise.hpp"
 #include "TerrainConfig.hpp"
+#include "generator/HeightMapContainer.hpp"
 
 class FractalBrownianMotion {
 private:
-  double baseAmplitude{1.0};
-  double baseFrequency{0.01};
-  HeightMapGenerator &hMap;
+  HeightMapContainer &heightMapContainer;
   TerrainConfig tConf;
 
 public:
-  std::vector<std::vector<double>> fractalBrownianMotion(Noise &noiseFunc);
-  FractalBrownianMotion(HeightMapGenerator &hMap, TerrainConfig &tConf)
-      : hMap(hMap), tConf(tConf) {}
+  // std::vector<std::vector<double>>
+  void fractalBrownianMotion(Noise &noiseFunc);
+  FractalBrownianMotion(HeightMapContainer &heightMapContainer,
+                        TerrainConfig tConf)
+      : heightMapContainer(heightMapContainer), tConf(tConf) {}
 };

@@ -1,7 +1,6 @@
 #include "generator/FractalBrownianMotion.hpp"
-#include "generator/HeightMapFinContainer.hpp"
+#include "generator/HeightMapContainer.hpp"
 #include "generator/HeightMapGenerator.hpp"
-#include "generator/HeightMapRawContainer.hpp"
 #include "generator/Input.hpp"
 #include "generator/NoiseParametres.hpp"
 #include "generator/PerlinNoise.hpp"
@@ -16,31 +15,26 @@ int main() {
   auto inputValues = input.startInput();
 
   unsigned nodes = inputValues[0].size / inputValues[0].cellSize;
-  double coefficient = 2.5;
 
   HeightMapGenerator heightMainMapGenerator{inputValues[0]};
+  HeightMapContainer heightMapMainContainer{
+      heightMainMapGenerator.fieldXYCreator(nodes)};
 
-  heightMainMapGenerator.fieldXYCreator(nodes);
-
-  NoiseParametres perlinNoiseParam{heightMainMapGenerator.getFieldXY(),
+  NoiseParametres perlinNoiseParam{heightMapMainContainer.getHeightMap(),
                                    inputValues[0]};
 
-  PerlinNoise perlinNoise{0.05f, heightMainMapGenerator};
+  PerlinNoise perlinNoise{0.05f};
 
-  FractalBrownianMotion fBM{heightMainMapGenerator, inputValues[0]};
-  auto finalHMap = fBM.fractalBrownianMotion(perlinNoise);
+  FractalBrownianMotion fBM{heightMapMainContainer, inputValues[0]};
+  fBM.fractalBrownianMotion(perlinNoise);
 
-  HeightMapRawContainer<std::vector<std::vector<double>>> rawContainer(
-      finalHMap);
-  HeightMapFinContainer<std::vector<std::vector<double>>> finContainer(
-      rawContainer.getValue());
-  PostProcessor postProc{finContainer};
+  PostProcessor postProc{heightMapMainContainer};
   postProc.normalizeFunction();
-  postProc.remapFunction(coefficient);
+  postProc.remapFunction(inputValues[0].coefficient);
   postProc.scalingFunction(inputValues[0].minHeight, inputValues[0].maxHeight);
-  finContainer.showRawMap();
-  finContainer.showMin();
-  finContainer.showMax();
-  finContainer.showMid(std::pow(nodes, 2));
-  saveJSON(finContainer.getValue(), "heightmap.json");
+  // heightMapMainContainer.showMap();
+  heightMapMainContainer.showMin();
+  heightMapMainContainer.showMax();
+  heightMapMainContainer.showMid(std::pow(nodes, 2));
+  saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
 }

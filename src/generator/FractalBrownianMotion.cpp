@@ -1,27 +1,31 @@
+
 #include "FractalBrownianMotion.hpp"
+#include "HeightMapContainer.hpp"
 #include <algorithm>
 #include <vector>
 
-std::vector<std::vector<double>>
-FractalBrownianMotion::fractalBrownianMotion(Noise &noiseFunc) {
-  std::vector<std::vector<double>> fieldCopy = hMap.getFieldXY();
+// std::vector<std::vector<double>>
+void FractalBrownianMotion::fractalBrownianMotion(Noise &noiseFunc) {
+  std::vector<std::vector<double>> fieldCopy =
+      heightMapContainer.getHeightMap();
   for (int i = 0; i < tConf.octaveNumber; i++) {
-    double currentAmplitude = baseAmplitude * std::pow(tConf.persistence, i);
-    double currentFrequency = baseFrequency * std::pow(tConf.lacunarity, i);
-    noiseFunc.noise({hMap.getFieldXY(), tConf, currentFrequency});
-    for (auto row{hMap.getFieldXY().begin()}; row != hMap.getFieldXY().end();
-         ++row) {
+    double currentAmplitude =
+        tConf.baseAmplitude * std::pow(tConf.persistence, i);
+    double currentFrequency =
+        tConf.baseFrequency * std::pow(tConf.lacunarity, i);
+    noiseFunc.noise({fieldCopy, tConf, currentFrequency});
+    for (auto row{fieldCopy.begin()}; row != fieldCopy.end(); ++row) {
       for (auto col{row->begin()}; col != row->end(); ++col) {
         *col *= currentAmplitude;
       }
     }
-    for (unsigned i{0}; i < hMap.getFieldXY().size(); i++) {
-      std::transform(fieldCopy[i].begin(), fieldCopy[i].end(),
-                     hMap.getFieldXY()[i].begin(), fieldCopy[i].begin(),
-                     std::plus<double>());
+    for (unsigned i{0}; i < heightMapContainer.getHeightMap().size(); i++) {
+      std::transform(
+          heightMapContainer.getHeightMap()[i].begin(),
+          heightMapContainer.getHeightMap()[i].end(), fieldCopy[i].begin(),
+          heightMapContainer.getHeightMap()[i].begin(), std::plus<double>());
     }
   }
-  hMap.getFieldXY().clear();
-  hMap.getFieldXY().shrink_to_fit();
-  return fieldCopy;
+
+  // return heightMapContainer.getHeightMap();
 }
