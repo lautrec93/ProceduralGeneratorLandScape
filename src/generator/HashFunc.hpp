@@ -29,8 +29,3 @@ inline uint32_t hashMurMurFin(uint32_t x, uint32_t y, uint32_t seed) {
 
   return funcMixer(h);
 }
-
-// not to forget at the end add bitcast for float/double arguments
-// not to forhet about -0.0 and 0.0 dif
-
-// for string should use xxhash
