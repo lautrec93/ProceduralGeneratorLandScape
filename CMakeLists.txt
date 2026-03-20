@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(TBB REQUIRED)
 
 file(GLOB_RECURSE SOURCES
-    src/*.cpp
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
 )
 
 add_executable(app ${SOURCES})
