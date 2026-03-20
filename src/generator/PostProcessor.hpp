@@ -1,11 +1,10 @@
 #pragma once
+
 #include "HeightMapFinContainer.hpp"
-#include "generator/TerrainConfig.hpp"
 #include <vector>
 class PostProcessor {
 private:
   HeightMapFinContainer<std::vector<std::vector<double>>> &finContainer;
-  TerrainConfig terrConf;
 
 public:
   void normalizeFunction();
