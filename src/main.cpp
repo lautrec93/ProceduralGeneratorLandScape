@@ -23,7 +23,7 @@ int main() {
   NoiseParametres perlinNoiseParam{heightMapMainContainer.getHeightMap(),
                                    inputValues[0]};
 
-  PerlinNoise perlinNoise{0.05f};
+  PerlinNoise perlinNoise;
 
   FractalBrownianMotion fBM{heightMapMainContainer, inputValues[0]};
   fBM.fractalBrownianMotion(perlinNoise);
