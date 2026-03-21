@@ -17,5 +17,4 @@ public:
   double getY() const override;
   void changeX(double number) override;
   void changeY(double number) override;
-  PerlinNoise(float scale) : scaleXY(scale) {}
 };
