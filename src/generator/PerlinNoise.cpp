@@ -11,8 +11,8 @@ void PerlinNoise::noise(const NoiseParametres &params) {
   for (auto row{params.field.begin()}; row != params.field.end(); ++row) {
     j = 0;
     for (auto col{row->begin()}; col != row->end(); ++col) {
-      x = i * scaleXY * params.freq.value_or(1.0);
-      y = j * scaleXY * params.freq.value_or(1.0);
+      x = i * params.terCon.noizeScale * params.freq.value_or(1.0);
+      y = j * params.terCon.noizeScale * params.freq.value_or(1.0);
       double cellX = std::floor(x);
       double cellY = std::floor(y);
 
