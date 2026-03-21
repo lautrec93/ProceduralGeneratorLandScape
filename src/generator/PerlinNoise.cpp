@@ -16,46 +16,34 @@ void PerlinNoise::noise(const NoiseParametres &params) {
       double cellX = std::floor(x);
       double cellY = std::floor(y);
 
-      std::vector<Offsets> node00{};
-      std::vector<Offsets> node01{};
-      std::vector<Offsets> node10{};
-      std::vector<Offsets> node11{};
-      node00.push_back({cellX, cellY});
-      node10.push_back({cellX + 1, cellY});
-      node01.push_back({cellX, cellY + 1});
-      node11.push_back({cellX + 1, cellY + 1});
+      Offsets node00{cellX, cellY};
+      Offsets node10{cellX + 1, cellY};
+      Offsets node01{cellX, cellY + 1};
+      Offsets node11{cellX + 1, cellY + 1};
 
       unsigned index00 =
-          hashMurMurFin(node00[0].x, node00[0].y, params.terCon.seed) & 7;
+          hashMurMurFin(node00.x, node00.y, params.terCon.seed) & 7;
       unsigned index10 =
-          hashMurMurFin(node10[0].x, node10[0].y, params.terCon.seed) & 7;
+          hashMurMurFin(node10.x, node10.y, params.terCon.seed) & 7;
       unsigned index01 =
-          hashMurMurFin(node01[0].x, node01[0].y, params.terCon.seed) & 7;
+          hashMurMurFin(node01.x, node01.y, params.terCon.seed) & 7;
       unsigned index11 =
-          hashMurMurFin(node11[0].x, node11[0].y, params.terCon.seed) & 7;
+          hashMurMurFin(node11.x, node11.y, params.terCon.seed) & 7;
 
-      std::vector<Offsets> grad00{};
-      std::vector<Offsets> grad01{};
-      std::vector<Offsets> grad10{};
-      std::vector<Offsets> grad11{};
-      grad00.push_back(offsets[index00]);
-      grad10.push_back(offsets[index10]);
-      grad01.push_back(offsets[index01]);
-      grad11.push_back(offsets[index11]);
+      Offsets grad00{offsets[index00]};
+      Offsets grad10{offsets[index10]};
+      Offsets grad01{offsets[index01]};
+      Offsets grad11{offsets[index11]};
 
-      std::vector<Offsets> dir00{};
-      std::vector<Offsets> dir01{};
-      std::vector<Offsets> dir10{};
-      std::vector<Offsets> dir11{};
-      dir00.push_back({x - cellX, y - cellY});
-      dir10.push_back({x - cellX - 1, y - cellY});
-      dir01.push_back({x - cellX, y - cellY - 1});
-      dir11.push_back({x - cellX - 1, y - cellY - 1});
+      Offsets dir00{x - cellX, y - cellY};
+      Offsets dir10{x - cellX - 1, y - cellY};
+      Offsets dir01{x - cellX, y - cellY - 1};
+      Offsets dir11{x - cellX - 1, y - cellY - 1};
 
-      double dot00 = grad00[0].x * dir00[0].x + grad00[0].y * dir00[0].y;
-      double dot10 = grad10[0].x * dir10[0].x + grad10[0].y * dir10[0].y;
-      double dot01 = grad01[0].x * dir01[0].x + grad01[0].y * dir01[0].y;
-      double dot11 = grad11[0].x * dir11[0].x + grad11[0].y * dir11[0].y;
+      double dot00 = grad00.x * dir00.x + grad00.y * dir00.y;
+      double dot10 = grad10.x * dir10.x + grad10.y * dir10.y;
+      double dot01 = grad01.x * dir01.x + grad01.y * dir01.y;
+      double dot11 = grad11.x * dir11.x + grad11.y * dir11.y;
 
       double ptlocX = x - cellX;
       double ptlocY = y - cellY;
