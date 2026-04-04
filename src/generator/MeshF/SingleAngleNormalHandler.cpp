@@ -1,0 +1,39 @@
+#include "generator/MeshF/SingleAngleNormalHandler.hpp"
+#include "generator/MeshF/MeshStructs.hpp"
+#include <algorithm>
+#include <cmath>
+
+double SingleAngleNormalHandler::angleCount(unsigned x1, unsigned x2,
+                                            unsigned x, unsigned z1,
+                                            unsigned z2, unsigned z, double y1,
+                                            double y2, double y) {
+  Coord vectorAB{x1 - x, z1 - z, y1 - y};
+  Coord vectorAC{x2 - x, z2 - z, y2 - y};
+  double scalarMultiply{vectorAB.x * vectorAC.x + vectorAB.z * vectorAC.z +
+                        vectorAB.y * vectorAC.y};
+  double vectABLength{std::sqrt(std::pow(vectorAB.x, 2) +
+                                std::pow(vectorAB.z, 2) +
+                                std::pow(vectorAB.y, 2))};
+  double vectACLength{std::sqrt(std::pow(vectorAC.x, 2) +
+                                std::pow(vectorAC.z, 2) +
+                                std::pow(vectorAC.y, 2))};
+  double cosinus =
+      std::clamp(scalarMultiply / (vectABLength * vectACLength), -1.0, 1.0);
+  double arccosinus = std::acos(cosinus);
+  return arccosinus;
+}
+
+Normal SingleAngleNormalHandler::singleNormalCounter(unsigned x1, unsigned x2,
+                                                     unsigned x, unsigned z1,
+                                                     unsigned z2, unsigned z,
+                                                     double y1, double y2,
+                                                     double y) {
+  Coord vectorAB{x1 - x, z1 - z, y1 - y};
+  Coord vectorAC{x2 - x, z2 - z, y2 - y};
+  Normal singleNormal{
+      vectorAB.z * vectorAC.y - vectorAB.y * vectorAC.z,
+      vectorAB.y * vectorAC.x - vectorAB.x * vectorAC.y,
+      static_cast<double>(vectorAB.x * vectorAC.z - vectorAB.z * vectorAC.x)};
+
+  return singleNormal;
+}
