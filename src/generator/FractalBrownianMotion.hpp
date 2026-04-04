@@ -1,8 +1,8 @@
 #pragma once
 
+#include "HeightMapContainer.hpp"
 #include "Noise.hpp"
 #include "TerrainConfig.hpp"
-#include "generator/HeightMapContainer.hpp"
 
 class FractalBrownianMotion {
 private:
