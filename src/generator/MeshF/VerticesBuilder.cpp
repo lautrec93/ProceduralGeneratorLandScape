@@ -6,5 +6,5 @@ Vertices VerticesBuilder::vertexBuild(unsigned index) {
   vertex.normal = normalBuilder.normalSummation(index);
   vertex.uv = uvBuilder.uvCounter(index);
 
-  return this->vertex;
+  return vertex;
 }

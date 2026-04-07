@@ -4,22 +4,20 @@
 #include "generator/MeshF/MeshStructs.hpp"
 #include "generator/MeshF/NeighbouredTrianglesFinder.hpp"
 #include "generator/MeshF/SingleAngleNormalHandler.hpp"
-#include "generator/TerrainConfig.hpp"
 class NormalBuilder {
 private:
-  TerrainConfig terrainConfig;
   CoordsBuilder coordBuilder;
   NeighbouredTrianglesFinder &nTF;
   SingleAngleNormalHandler &sANH;
   Mesh &mesh;
-  Normal normalProcessing(unsigned triangleIndex);
+  const Indices **indPtr = nullptr;
+  Normal normalProcessing(const Indices &triangle);
+  unsigned countNumberOfTriangles(unsigned size, unsigned index);
 
 public:
   Normal normalSummation(unsigned index);
 
-  NormalBuilder(Mesh &mesh, TerrainConfig terrainConfig,
-                CoordsBuilder coordBuilder, NeighbouredTrianglesFinder &nTF,
-                SingleAngleNormalHandler &sANH)
-      : mesh(mesh), terrainConfig(terrainConfig), coordBuilder(coordBuilder),
-        nTF(nTF), sANH(sANH) {};
+  NormalBuilder(Mesh &mesh, CoordsBuilder coordBuilder,
+                NeighbouredTrianglesFinder &nTF, SingleAngleNormalHandler &sANH)
+      : mesh(mesh), coordBuilder(coordBuilder), nTF(nTF), sANH(sANH) {};
 };

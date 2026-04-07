@@ -47,9 +47,9 @@ int main() {
   saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
   CoordsBuilder coordsBuilder(heightMapMainContainer, inputValues[0]);
   Mesh mesh;
-  NeighbouredTrianglesFinder nTF(mesh, inputValues[0]);
+  NeighbouredTrianglesFinder nTF;
   SingleAngleNormalHandler sANH;
-  NormalBuilder normalBuilder(mesh, inputValues[0], coordsBuilder, nTF, sANH);
+  NormalBuilder normalBuilder(mesh, coordsBuilder, nTF, sANH);
   UVBuilder uvBuilder(inputValues[0]);
   VerticesBuilder verticesBuilder(coordsBuilder, normalBuilder, uvBuilder);
   MeshBuilder meshBuilder(mesh, verticesBuilder);

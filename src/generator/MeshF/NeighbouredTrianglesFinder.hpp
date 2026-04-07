@@ -1,16 +1,14 @@
 #pragma once
-#include "generator/MeshF/Mesh.hpp"
-#include "generator/TerrainConfig.hpp"
+#include "generator/MeshF/MeshStructs.hpp"
+#include <cstddef>
 #include <vector>
 class NeighbouredTrianglesFinder {
 private:
-  TerrainConfig terrainConfig;
-  std::vector<std::vector<unsigned>> vertToInd;
-  Mesh &mesh;
+  std::vector<const Indices *> indexOfTriangles;
 
 public:
-  std::vector<std::vector<unsigned>> vertecesToIndeces(unsigned i);
+  std::vector<const Indices *>
+  trianglesPutter(const std::vector<Indices> &indices);
 
-  NeighbouredTrianglesFinder(Mesh &mesh, TerrainConfig terrainConfig)
-      : mesh(mesh), terrainConfig(terrainConfig) {};
+  NeighbouredTrianglesFinder() = default;
 };
