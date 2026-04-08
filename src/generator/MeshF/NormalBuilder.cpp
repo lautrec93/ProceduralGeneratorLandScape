@@ -1,6 +1,10 @@
 #include "NormalBuilder.hpp"
 #include "generator/Globals.hpp"
 #include "generator/MeshF/MeshStructs.hpp"
+#include <cmath>
+#include <iostream>
+#include <range/v3/view/concat.hpp>
+#include <span>
 #include <vector>
 
 Normal NormalBuilder::normalSummation(
@@ -9,20 +13,13 @@ Normal NormalBuilder::normalSummation(
                       // нормализуем
 
   Normal finalNormal{};
-  std::vector<const Indices *> listOfTrianglesOfPoints =
-      nTF.trianglesPutter(mesh.indices);
-  indPtr = &listOfTrianglesOfPoints[0];
+  auto window = windowOption(mesh.indices.size(), index, mesh.indices);
 
-  for (unsigned i{0}; i < countNumberOfTriangles(mesh.indices.size(), index);
-       i++) {
-
-    finalNormal += (normalProcessing(**indPtr));
-    ++indPtr;
+  for (const auto &triangle : window) {
+    finalNormal += (normalProcessing(triangle));
   }
 
-  double normalLength{std::sqrt(std::pow(finalNormal.x, 2) +
-                                std::pow(finalNormal.z, 2) +
-                                std::pow(finalNormal.y, 2))};
+  double normalLength = std::hypot(finalNormal.x, finalNormal.z, finalNormal.y);
   finalNormal = {finalNormal.x / normalLength, finalNormal.z / normalLength,
                  finalNormal.y / normalLength};
   return finalNormal;
@@ -48,18 +45,88 @@ Normal NormalBuilder::normalProcessing(
   return scaledNormal;
 }
 
-unsigned NormalBuilder::countNumberOfTriangles(unsigned size, unsigned index) {
+ranges::any_view<Indices>
+NormalBuilder::windowOption(unsigned size, unsigned index,
+                            std::vector<Indices> &indices) {
+  unsigned unix = 2 * NUMBER_OF_NODES_IN_LINE - 1;
+  std::span<Indices> span1{};
+  std::span<Indices> span2{};
 
-  if (size - index == NUMBER_OF_NODES_IN_LINE ||
-      index == NUMBER_OF_NODES_IN_LINE - 1) {
-    return 1;
+  if (index == NUMBER_OF_NODES_IN_LINE - 1) {
+    span1 = {&indices[unix - 2], 1};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
 
-  } else if (index > NUMBER_OF_NODES_IN_LINE && index < size - index &&
-             (index % NUMBER_OF_NODES_IN_LINE > 0 &&
-              index % NUMBER_OF_NODES_IN_LINE < NUMBER_OF_NODES_IN_LINE - 1)) {
-    return 6;
+  else if (size - index == NUMBER_OF_NODES_IN_LINE) {
+    span1 = {
+        &indices[2 * std::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) - (unix - 1)], 1};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
 
+  else if (index < NUMBER_OF_NODES_IN_LINE &&
+           (index % NUMBER_OF_NODES_IN_LINE < (NUMBER_OF_NODES_IN_LINE - 1) &&
+            index % NUMBER_OF_NODES_IN_LINE > 0)) {
+    span1 = {&indices[2 * index - 1], 3};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if (index > NUMBER_OF_NODES_IN_LINE - 1 &&
+           index < (size - NUMBER_OF_NODES_IN_LINE) &&
+           index % NUMBER_OF_NODES_IN_LINE == 0) {
+    span1 = {&indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1)], 1};
+    span2 = {&indices[(index / NUMBER_OF_NODES_IN_LINE) * (unix - 1)], 2};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if (index > NUMBER_OF_NODES_IN_LINE &&
+           index < (size - NUMBER_OF_NODES_IN_LINE) &&
+           index % NUMBER_OF_NODES_IN_LINE == (NUMBER_OF_NODES_IN_LINE - 1)) {
+    span1 = {&indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) +
+                      (unix - 3)],
+             2};
+    span2 = {&indices[(index / NUMBER_OF_NODES_IN_LINE + 1) * (unix - 1) - 1],
+             1};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if (index >= (size - NUMBER_OF_NODES_IN_LINE) &&
+           (index % NUMBER_OF_NODES_IN_LINE < (NUMBER_OF_NODES_IN_LINE - 1) &&
+            index % NUMBER_OF_NODES_IN_LINE > 0)) {
+
+    span1 = {&indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) +
+                      ((index % NUMBER_OF_NODES_IN_LINE - 1) * 2)],
+             3};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if (index == 0) {
+    span1 = {&indices[0], 2};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if (index == size - 1) {
+    span1 = {&indices[2 * std::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) - 1], 2};
+    span2 = {};
+    return ranges::views::concat(span1, span2);
+  }
+
+  else if ((index % NUMBER_OF_NODES_IN_LINE < (NUMBER_OF_NODES_IN_LINE - 1) &&
+            index % NUMBER_OF_NODES_IN_LINE > 0) &&
+           index > NUMBER_OF_NODES_IN_LINE &&
+           index < (size - NUMBER_OF_NODES_IN_LINE)) {
+    span1 = {&indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) +
+                      ((index % NUMBER_OF_NODES_IN_LINE - 1) * 2)],
+             3};
+    span2 = {
+        &indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) + unix], 3};
+    return ranges::views::concat(span1, span2);
   } else {
-    return 3;
+    std::cout << index << "\n";
+    throw std::runtime_error("Unexpected index in windowOption");
   }
 }
