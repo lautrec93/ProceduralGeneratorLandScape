@@ -28,12 +28,13 @@ Normal SingleAngleNormalHandler::singleNormalCounter(unsigned x1, unsigned x2,
                                                      unsigned z2, unsigned z,
                                                      double y1, double y2,
                                                      double y) {
-  Coord vectorAB{x1 - x, z1 - z, y1 - y};
-  Coord vectorAC{x2 - x, z2 - z, y2 - y};
-  Normal singleNormal{
-      vectorAB.z * vectorAC.y - vectorAB.y * vectorAC.z,
-      vectorAB.y * vectorAC.x - vectorAB.x * vectorAC.y,
-      static_cast<double>(vectorAB.x * vectorAC.z - vectorAB.z * vectorAC.x)};
+  Normal vectorAB{static_cast<double>(x1 - x), static_cast<double>(z1 - z),
+                  y1 - y};
+  Normal vectorAC{static_cast<double>(x2 - x), static_cast<double>(z2 - z),
+                  y2 - y};
+  Normal singleNormal{vectorAB.z * vectorAC.y - vectorAB.y * vectorAC.z,
+                      vectorAB.y * vectorAC.x - vectorAB.x * vectorAC.y,
+                      vectorAB.x * vectorAC.z - vectorAB.z * vectorAC.x};
 
   return singleNormal;
 }
