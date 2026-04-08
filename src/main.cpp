@@ -43,13 +43,12 @@ int main() {
   // heightMapMainContainer.showMap();
   heightMapMainContainer.showMin();
   heightMapMainContainer.showMax();
-  heightMapMainContainer.showMid(std::pow(NUMBER_OF_NODES_IN_LINE, 2));
+  heightMapMainContainer.showMid(std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2));
   saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
   CoordsBuilder coordsBuilder(heightMapMainContainer, inputValues[0]);
   Mesh mesh;
-  NeighbouredTrianglesFinder nTF;
   SingleAngleNormalHandler sANH;
-  NormalBuilder normalBuilder(mesh, coordsBuilder, nTF, sANH);
+  NormalBuilder normalBuilder(mesh, coordsBuilder, sANH);
   UVBuilder uvBuilder(inputValues[0]);
   VerticesBuilder verticesBuilder(coordsBuilder, normalBuilder, uvBuilder);
   MeshBuilder meshBuilder(mesh, verticesBuilder);
