@@ -10,9 +10,9 @@ void FractalBrownianMotion::fractalBrownianMotion(Noise &noiseFunc) {
       heightMapContainer.getHeightMap();
   for (int i = 0; i < tConf.octaveNumber; i++) {
     double currentAmplitude =
-        tConf.baseAmplitude * std::pow(tConf.persistence, i);
+        tConf.baseAmplitude * std::__math::pow(tConf.persistence, i);
     double currentFrequency =
-        tConf.baseFrequency * std::pow(tConf.lacunarity, i);
+        tConf.baseFrequency * std::__math::pow(tConf.lacunarity, i);
     noiseFunc.noise({fieldCopy, tConf, currentFrequency});
     for (auto row{fieldCopy.begin()}; row != fieldCopy.end(); ++row) {
       for (auto col{row->begin()}; col != row->end(); ++col) {
