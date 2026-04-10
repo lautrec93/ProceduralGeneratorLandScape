@@ -1,5 +1,5 @@
 #include "generator/MeshF/IndicesBuilder.hpp"
-#include "generator/Globals.hpp"
+#include "generator/Instruments/Globals.hpp"
 
 Indices IndicesBuilder::evenPTT(unsigned index) {
   triangleIndex.a =

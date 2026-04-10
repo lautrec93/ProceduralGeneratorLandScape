@@ -1,5 +1,5 @@
 #pragma once
-#include "MeshStructs.hpp"
+#include "generator/MeshF/MeshStructs.hpp"
 #include <vector>
 
 struct Mesh {

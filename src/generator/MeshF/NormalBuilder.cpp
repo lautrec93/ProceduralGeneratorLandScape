@@ -1,5 +1,5 @@
 #include "NormalBuilder.hpp"
-#include "generator/Globals.hpp"
+#include "generator/Instruments/Globals.hpp"
 #include "generator/MeshF/MeshStructs.hpp"
 #include <cmath>
 #include <iostream>

@@ -6,11 +6,11 @@
 class MeshBuilder {
 private:
   Mesh &mesh;
-  IndicesBuilder indecesBuilder;
-  VerticesBuilder vertecesBuilder;
+  IndicesBuilder indicesBuilder;
+  VerticesBuilder verticesBuilder;
 
 public:
   void meshBuild();
-  MeshBuilder(Mesh &mesh, VerticesBuilder vertecesBuilder)
-      : mesh(mesh), vertecesBuilder(vertecesBuilder) {};
+  MeshBuilder(Mesh &mesh, VerticesBuilder verticesBuilder)
+      : mesh(mesh), verticesBuilder(verticesBuilder) {};
 };

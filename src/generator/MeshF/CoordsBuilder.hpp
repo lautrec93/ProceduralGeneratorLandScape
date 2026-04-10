@@ -1,7 +1,7 @@
 #pragma once
-#include "generator/HeightMapContainer.hpp"
+#include "generator/HeightMap/HeightMapContainer.hpp"
+#include "generator/IOConfigs/TerrainConfig.hpp"
 #include "generator/MeshF/MeshStructs.hpp"
-#include "generator/TerrainConfig.hpp"
 
 class CoordsBuilder {
 private:

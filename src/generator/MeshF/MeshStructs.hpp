@@ -1,12 +1,12 @@
 #pragma once
 
-struct Coord {
+struct Coord { // 16 baits
   unsigned x;
   unsigned z;
   double y;
 };
 
-struct Normal {
+struct Normal { // 24 baits
   double x;
   double z;
   double y;
@@ -20,18 +20,26 @@ struct Normal {
   }
 };
 
-struct UV {
+struct UV { // 16 baits
   double u;
   double v;
 };
 
-struct Vertices {
+struct Colour { // 32 baits
+  double RSlope;
+  double GHeight;
+  double BDepth;
+  double aBiome;
+};
+
+struct Vertices { // 16 + 24 + 16 + 32 = 88 baits
   Coord coord;
   Normal normal;
   UV uv;
+  Colour colour;
 };
 
-struct Indices {
+struct Indices { // 12 baits
   unsigned a;
   unsigned b;
   unsigned c;
