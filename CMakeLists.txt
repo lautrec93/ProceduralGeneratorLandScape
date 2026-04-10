@@ -37,3 +37,5 @@ target_link_libraries(app PRIVATE
     "-framework IOKit"
     "-framework CoreVideo"
 )
+
+target_compile_definitions(app PRIVATE OUTPUT_DIR="${CMAKE_BINARY_DIR}")
