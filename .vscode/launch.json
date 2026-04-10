@@ -6,7 +6,7 @@
       "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build/app",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/build",
       "args": [],
       "preLaunchTask": "build active file"
     }
