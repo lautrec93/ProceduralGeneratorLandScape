@@ -1,1 +1,0 @@
-extern unsigned NUMBER_OF_NODES_IN_LINE;
