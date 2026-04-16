@@ -19,7 +19,7 @@ Normal NormalBuilder::normalSummation(
     finalNormal += (normalProcessing(triangle));
   }
 
-  double normalLength = std::hypot(finalNormal.x, finalNormal.z, finalNormal.y);
+  float normalLength = std::hypot(finalNormal.x, finalNormal.z, finalNormal.y);
   finalNormal = {finalNormal.x / normalLength, finalNormal.z / normalLength,
                  finalNormal.y / normalLength};
   return finalNormal;
@@ -32,7 +32,7 @@ Normal NormalBuilder::normalProcessing(
   Coord currentCoordA = coordBuilder.coordsCounting(triangle.a);
   Coord currentCoordB = coordBuilder.coordsCounting(triangle.b);
   Coord currentCoordC = coordBuilder.coordsCounting(triangle.c);
-  double angle =
+  float angle =
       sANH.angleCount(currentCoordB.x, currentCoordC.x, currentCoordA.x,
                       currentCoordB.z, currentCoordC.z, currentCoordA.z,
                       currentCoordB.y, currentCoordC.y, currentCoordA.y);
