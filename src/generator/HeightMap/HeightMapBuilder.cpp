@@ -1,5 +1,7 @@
 #include "generator/HeightMap/HeightMapBuilder.hpp"
 #include "generator/Instruments/Globals.hpp"
+#include "generator/Noise/PerlinNoise.hpp"
+#include <cstdio>
 void HeightMapBuilder::heightMapBuilder() {
   heightMapContainer.heightMapResize(
       std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2));

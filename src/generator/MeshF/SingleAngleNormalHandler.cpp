@@ -7,8 +7,10 @@ double SingleAngleNormalHandler::angleCount(unsigned x1, unsigned x2,
                                             unsigned x, unsigned z1,
                                             unsigned z2, unsigned z, double y1,
                                             double y2, double y) {
-  Coord vectorAB{x1 - x, z1 - z, static_cast<float>(y1 - y)};
-  Coord vectorAC{x2 - x, z2 - z, static_cast<float>(y2 - y)};
+  Coord vectorAB{static_cast<float>(x1 - x), static_cast<float>(z1 - z),
+                 static_cast<float>(y1 - y)};
+  Coord vectorAC{static_cast<float>(x2 - x), static_cast<float>(z2 - z),
+                 static_cast<float>(y2 - y)};
   double scalarMultiply{vectorAB.x * vectorAC.x + vectorAB.z * vectorAC.z +
                         vectorAB.y * vectorAC.y};
   double vectABLength{std::sqrt(std::pow(vectorAB.x, 2) +

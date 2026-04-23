@@ -29,10 +29,15 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     "${CMAKE_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(TerrainGen ${SOURCES})
+add_executable(TerrainGen ${SOURCES}
+    src/generator/TerrainSystem.cpp)
 
 target_include_directories(TerrainGen PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_include_directories(TerrainGen PRIVATE
+    external/glad/include
 )
 
 if(APPLE)

@@ -5,7 +5,7 @@
       "name": "Debug (LLDB)",
       "type": "lldb",
       "request": "launch",
-      "program": "${workspaceFolder}/build/app",
+      "program": "${workspaceFolder}/build/TerrainGen",
       "cwd": "${workspaceFolder}/build",
       "args": [],
       "preLaunchTask": "build active file"

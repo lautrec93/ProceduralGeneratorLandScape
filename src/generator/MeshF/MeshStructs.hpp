@@ -1,8 +1,8 @@
 #pragma once
 
 struct Coord {
-  unsigned x;
-  unsigned z;
+  float x;
+  float z;
   float y;
 };
 
