@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-void TerrainSystem::runTerrainSystem() {
+void TerrainSystem::runTerrainSystem(Mesh &mesh) {
   Input input;
   auto inputValues = input.startInput();
 
@@ -36,7 +36,6 @@ void TerrainSystem::runTerrainSystem() {
   saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
 
   CoordsBuilder coordsBuilder(heightMapMainContainer, inputValues[0]);
-  Mesh mesh;
   SingleAngleNormalHandler sANH;
   NormalBuilder normalBuilder(mesh, coordsBuilder, sANH);
   UVBuilder uvBuilder(inputValues[0]);

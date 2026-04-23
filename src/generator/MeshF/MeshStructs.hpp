@@ -2,8 +2,8 @@
 
 struct Coord {
   float x;
-  float z;
   float y;
+  float z;
 };
 
 struct Normal {
@@ -32,11 +32,11 @@ struct Colour {
   float aBiome;
 };
 
-struct Vertices {
-  Coord coord;
-  Normal normal;
-  UV uv;
-  Colour colour;
+struct Vertices { // 48
+  Coord coord;    // 12
+  Normal normal;  // 12
+  UV uv;          // 8
+  Colour colour;  // 16
 };
 
 struct Indices {
