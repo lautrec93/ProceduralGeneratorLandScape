@@ -90,7 +90,7 @@ int Application::runApplication(Mesh &mesh) {
                         (void *)(offsetof(Vertices, colour)));
   glEnableVertexAttribArray(3);
 
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
     processInput(window, ourShader);
@@ -101,24 +101,52 @@ int Application::runApplication(Mesh &mesh) {
     std::cout << mesh.vertices[(unsigned)glfwGetTime()].coord.x << " "
               << mesh.vertices[(unsigned)glfwGetTime()].coord.y << " "
               << mesh.vertices[(unsigned)glfwGetTime()].coord.z << std::endl;
-    ourShader.use();
 
-    glm::mat4 projection = glm::mat4(1.0f);
+    // glm::mat4 projection = glm::mat4(1.0f);
+    // view = glm::translate(view, glm::vec3(3.0f, 3.0f, -3.0f));
     glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
+    // glm::mat4 view = glm::mat4(1.0f);
 
-    view = glm::translate(view, glm::vec3(-3000.0f, -3000.0f, -3000.0f));
-    projection =
-        glm::perspective(glm::radians(45.0f),
-                         (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    float time = glfwGetTime(); // или SDL_GetTicks() / 1000.0f
 
-    unsigned int modelLoc = glGetUniformLocation(ourShader.programID, "model");
-    unsigned int viewLoc = glGetUniformLocation(ourShader.programID, "view");
+    float orbitYaw = time * 30.0f; // 30 градусов в секунду, меняй под себя
+    float orbitPitch =
+        20.0f; // фиксированный наклон, или тоже можно анимировать
+    float orbitRadius = 5000.0f;
 
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    float yawRad = orbitYaw * (M_PI / 180.0f);
+    float pitchRad = orbitPitch * (M_PI / 180.0f);
 
+    glm::vec3 target = {2000.0f, 1500.0f, 2000.0f};
+    glm::vec3 cameraPos;
+
+    cameraPos.x = target.x + orbitRadius * cosf(pitchRad) * sinf(yawRad);
+    cameraPos.y = target.y + orbitRadius * sinf(pitchRad);
+    cameraPos.z = target.z + orbitRadius * cosf(pitchRad) * cosf(yawRad);
+
+    glm::mat4 view = lookAt(cameraPos, target, (glm::vec3){0, 1, 0});
+
+    /*glm::vec3 cameraPos =
+            glm::vec3(-500.0f, 1500.0f, -3500.0f); // левее и дальше
+    glm::vec3 cameraTarget =
+        glm::vec3(1000.0f, 1500.0f, 1000.0f); // центр terrain
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);*/
+
+    glm:: // near должен быть не слишком маленьким, far — перекрывать всю сцену
+        mat4 projection = glm::perspective(
+            glm::radians(45.0f), // fov
+            (float)SCR_WIDTH / (float)SCR_HEIGHT,
+            10.0f, // near — не ставь 0.001, при больших сценах будет z-fighting
+            50000.0f // far — должен покрывать весь диапазон
+        );
+    // projection =
+    //   glm::perspective(glm::radians(45.0f),
+    //                  (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+    ourShader.use();
     ourShader.setMat4("projection", projection);
+    ourShader.setMat4("view", view);
+    ourShader.setMat4("model", model);
 
     glBindVertexArray(VAO);
 
