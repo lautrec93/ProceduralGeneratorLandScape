@@ -1,12 +1,13 @@
 #include "generator/HeightMap/HeightMapBuilder.hpp"
 #include "generator/Instruments/Globals.hpp"
 #include "generator/Noise/PerlinNoise.hpp"
+#include <cmath>
 #include <cstdio>
 void HeightMapBuilder::heightMapBuilder() {
-  heightMapContainer.heightMapResize(
-      std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2));
-  for (unsigned i{0}; i < heightMapContainer.getHeightMap().size(); ++i) {
-    for (unsigned j{0}; j < terrainConfig.octaveNumber; ++j) {
+  heightMapContainer.heightMapResize(std::pow(NUMBER_OF_NODES_IN_LINE, 2));
+#pragma omp parallel for collapse(2) schedule(static)
+  for (unsigned i = 0; i < heightMapContainer.getHeightMap().size(); ++i) {
+    for (unsigned j = 0; j < terrainConfig.octaveNumber; ++j) {
       heightMapContainer.getHeightMap()[i] +=
           fractalBrownianMotion.fractalBrownianMotionFunc(
               perlinNoise, i / NUMBER_OF_NODES_IN_LINE,
@@ -17,7 +18,9 @@ void HeightMapBuilder::heightMapBuilder() {
   }
   double min = heightMapContainer.getMin();
   double max = heightMapContainer.getMax();
-  for (unsigned i{0}; i < heightMapContainer.getHeightMap().size(); ++i) {
+
+#pragma omp parallel for
+  for (unsigned i = 0; i < heightMapContainer.getHeightMap().size(); ++i) {
     heightMapContainer.getHeightMap()[i] =
         postProcessor.normalizeFunction(i, min, max);
     heightMapContainer.getHeightMap()[i] =

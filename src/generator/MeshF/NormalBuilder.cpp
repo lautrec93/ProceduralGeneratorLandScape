@@ -3,6 +3,7 @@
 #include "generator/MeshF/MeshStructs.hpp"
 #include <cmath>
 #include <iostream>
+#include <range/v3/range/conversion.hpp>
 #include <range/v3/view/concat.hpp>
 #include <span>
 #include <vector>
@@ -18,6 +19,21 @@ Normal NormalBuilder::normalSummation(
   for (const auto &triangle : window) {
     finalNormal += (normalProcessing(triangle));
   }
+
+  /*auto window = windowOption(mesh.indices.size(), index, mesh.indices) |
+                ranges::to<std::vector<Indices>>();
+
+  #pragma omp parallel
+    {
+      Normal localNormal{.x = 0.0f, .z = 0.0f, .y = 0.0f};
+
+  #pragma omp for
+      for (int i = 0; i < (int)window.size(); i++)
+        localNormal += normalProcessing(window[i]);
+
+  #pragma omp critical
+      finalNormal += localNormal;
+    }*/
 
   float normalLength = std::hypot(finalNormal.x, finalNormal.z, finalNormal.y);
   finalNormal = {finalNormal.x / normalLength, finalNormal.z / normalLength,
@@ -59,8 +75,9 @@ NormalBuilder::windowOption(unsigned size, unsigned index,
   }
 
   else if (size - index == NUMBER_OF_NODES_IN_LINE) {
-    span1 = {
-        &indices[2 * std::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) - (unix - 1)], 1};
+    span1 = {&indices[2 * std::__math::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) -
+                      (unix - 1)],
+             1};
     span2 = {};
     return ranges::views::concat(span1, span2);
   }
@@ -110,7 +127,8 @@ NormalBuilder::windowOption(unsigned size, unsigned index,
   }
 
   else if (index == size - 1) {
-    span1 = {&indices[2 * std::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) - 1], 2};
+    span1 = {&indices[2 * std::__math::pow(NUMBER_OF_NODES_IN_LINE - 1, 2) - 1],
+             2};
     span2 = {};
     return ranges::views::concat(span1, span2);
   }
