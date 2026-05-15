@@ -32,6 +32,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+glm::vec3 lightPos(2000.0, 3000.0, 3000.0);
+
 int Application::runApplication(Mesh &mesh) {
 
   glfwInit();
@@ -63,10 +65,17 @@ int Application::runApplication(Mesh &mesh) {
 
   glEnable(GL_DEPTH_TEST);
 
-  Shader ourShader("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-                   "shaders/terrain.vert",
-                   "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-                   "shaders/terrain.frag");
+  Shader terrainShader(
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+      "shaders/terrain.vert",
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+      "shaders/terrain.frag");
+
+  Shader lampShader(
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+      "shaders/lamp.vert",
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+      "shaders/lamp.frag");
 
   unsigned int VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO);
@@ -103,9 +112,143 @@ int Application::runApplication(Mesh &mesh) {
                         (void *)(offsetof(Vertices, colour)));
   glEnableVertexAttribArray(3);
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  float vertices[] = {
+      // Front face
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+
+      // Back face
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+
+      // Left face
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+
+      // Right face
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+
+      // Bottom face
+      -0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      -0.5f,
+
+      // Top face
+      -0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+      0.5f,
+      -0.5f,
+      0.5f,
+      -0.5f,
+      -0.5f,
+      0.5f,
+      0.5f,
+  };
+
+  unsigned lampVBO, lampVAO;
+  glGenBuffers(1, &lampVBO);
+  glGenVertexArrays(1, &lampVAO);
+
+  glBindVertexArray(lampVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  glBindVertexArray(0);
+
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
+    glDisable(GL_CULL_FACE);
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
@@ -115,21 +258,45 @@ int Application::runApplication(Mesh &mesh) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ourShader.use();
+    float radius = 3000.0f;
+    float angle = glfwGetTime() * 0.5f;
+
+    glm::vec3 lightPos(20000.0f + radius * cos(angle), 5000.0f,
+                       20000.0f + radius * sin(angle));
+
+    terrainShader.use();
+    terrainShader.setVec3("objectColor", 0.4, 0.6, 0.3);
+    terrainShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    terrainShader.setVec3("lightPos", lightPos);
+    terrainShader.setVec3("viewPos", camera.Position);
 
     glm::mat4 projection =
         glm::perspective(glm::radians(camera.Zoom),
                          (float)SCR_WIDTH / (float)SCR_HEIGHT, 10.0f, 50000.0f);
-    ourShader.setMat4("projection", projection);
+    terrainShader.setMat4("projection", projection);
 
     glm::mat4 view = camera.camera_view();
-    ourShader.setMat4("view", view);
+    terrainShader.setMat4("view", view);
 
     glm::mat4 model = glm::mat4(1.0f);
-    ourShader.setMat4("model", model);
+    terrainShader.setMat4("model", model);
+
+    glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+    terrainShader.setMat3("normalMatrix", normalMatrix);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh.indices.size() * 3, GL_UNSIGNED_INT, 0);
+
+    lampShader.use();
+    lampShader.setMat4("projection", projection);
+    lampShader.setMat4("view", view);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(100.0f));
+    lampShader.setMat4("model", model);
+
+    glBindVertexArray(lampVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -140,6 +307,8 @@ int Application::runApplication(Mesh &mesh) {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
+  glDeleteVertexArrays(1, &lampVAO);
+  glDeleteBuffers(1, &lampVBO);
 
   glfwTerminate();
   return 0;

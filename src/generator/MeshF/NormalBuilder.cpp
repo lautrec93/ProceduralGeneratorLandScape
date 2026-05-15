@@ -35,9 +35,9 @@ Normal NormalBuilder::normalSummation(
       finalNormal += localNormal;
     }*/
 
-  float normalLength = std::hypot(finalNormal.x, finalNormal.z, finalNormal.y);
-  finalNormal = {finalNormal.x / normalLength, finalNormal.z / normalLength,
-                 finalNormal.y / normalLength};
+  float normalLength = std::hypot(finalNormal.x, finalNormal.y, finalNormal.z);
+  finalNormal = {finalNormal.x / normalLength, finalNormal.y / normalLength,
+                 finalNormal.z / normalLength};
   return finalNormal;
 }
 
@@ -50,13 +50,13 @@ Normal NormalBuilder::normalProcessing(
   Coord currentCoordC = coordBuilder.coordsCounting(triangle.c);
   float angle =
       sANH.angleCount(currentCoordB.x, currentCoordC.x, currentCoordA.x,
-                      currentCoordB.z, currentCoordC.z, currentCoordA.z,
-                      currentCoordB.y, currentCoordC.y, currentCoordA.y);
+                      currentCoordB.y, currentCoordC.y, currentCoordA.y,
+                      currentCoordB.z, currentCoordC.z, currentCoordA.z);
   Normal normal = sANH.singleNormalCounter(
-      currentCoordB.x, currentCoordC.x, currentCoordA.x, currentCoordB.z,
-      currentCoordC.z, currentCoordA.z, currentCoordB.y, currentCoordC.y,
-      currentCoordA.y);
-  Normal scaledNormal = {normal.x * angle, normal.z * angle, normal.y * angle};
+      currentCoordB.x, currentCoordC.x, currentCoordA.x, currentCoordB.y,
+      currentCoordC.y, currentCoordA.y, currentCoordB.z, currentCoordC.z,
+      currentCoordA.z);
+  Normal scaledNormal = {normal.x * angle, normal.y * angle, normal.z * angle};
 
   return scaledNormal;
 }

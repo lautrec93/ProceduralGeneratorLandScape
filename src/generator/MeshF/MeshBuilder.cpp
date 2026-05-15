@@ -3,7 +3,6 @@
 #include <iostream>
 
 void MeshBuilder::meshBuild() {
-  // unsigned count{0};
   std::cout << "NODES: " << NUMBER_OF_NODES_IN_LINE << "\n";
   for (unsigned i{0}; i <= (std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2) - 1) -
                                (NUMBER_OF_NODES_IN_LINE + 1);
@@ -13,10 +12,6 @@ void MeshBuilder::meshBuild() {
     }
     mesh.indices.push_back(indicesBuilder.evenPTT(i));
     mesh.indices.push_back(indicesBuilder.oddPTT(i));
-    /*std::cout << "Iteration nr: " << count
-              << " IndSize = " << mesh.indices.size() << " Index = " << i
-              << "\n";
-    ++count;*/
   }
 
   const unsigned total = std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2);

@@ -2,10 +2,9 @@
 #include "generator/MeshF/MeshStructs.hpp"
 class SingleAngleNormalHandler {
 public:
-  double angleCount(unsigned x1, unsigned x2, unsigned x, unsigned z1,
-                    unsigned z2, unsigned z, double y1, double y2, double y);
-  Normal singleNormalCounter(unsigned x1, unsigned x2, unsigned x, unsigned z1,
-                             unsigned z2, unsigned z, double y1, double y2,
-                             double y);
+  double angleCount(float x1, float x2, float x, float y1, float y2, float y,
+                    float z1, float z2, float z);
+  Normal singleNormalCounter(float x1, float x2, float x, float y1, float y2,
+                             float y, float z1, float z2, float z);
   SingleAngleNormalHandler() = default;
 };

@@ -8,13 +8,13 @@ struct Coord {
 
 struct Normal {
   float x;
-  float z;
   float y;
+  float z;
 
   Normal &operator+=(const Normal &other) {
     this->x += other.x;
-    this->z += other.z;
     this->y += other.y;
+    this->z += other.z;
 
     return *this;
   }
