@@ -21,8 +21,8 @@ void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 400;
 
 Camera camera(glm::vec3(2000.0f, 3000.0f, 8000.0f));
 float lastX = SCR_WIDTH / 2.0f;
