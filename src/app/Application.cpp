@@ -33,8 +33,6 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-glm::vec3 lightPos(2000.0, 3000.0, 3000.0);
-
 int Application::runApplication(Mesh &mesh) {
 
   glfwInit();
@@ -113,139 +111,6 @@ int Application::runApplication(Mesh &mesh) {
                         (void *)(offsetof(Vertices, colour)));
   glEnableVertexAttribArray(3);
 
-  float vertices[] = {
-      // Front face
-      -0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-
-      // Back face
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-
-      // Left face
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-
-      // Right face
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-
-      // Bottom face
-      -0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      -0.5f,
-
-      // Top face
-      -0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-      0.5f,
-      -0.5f,
-      0.5f,
-      -0.5f,
-      -0.5f,
-      0.5f,
-      0.5f,
-  };
-
-  unsigned lampVBO, lampVAO;
-  glGenBuffers(1, &lampVBO);
-  glGenVertexArrays(1, &lampVAO);
-
-  glBindVertexArray(lampVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  glBindVertexArray(0);
-
   unsigned int diffuseMap =
       loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
                   "textures/grass-field.jpg");
@@ -266,13 +131,12 @@ int Application::runApplication(Mesh &mesh) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float radius = 12000.0f;
-    float angle = glfwGetTime() * 0.5f;
-
-    glm::vec3 lightPos(20000.0f + radius * cos(angle), 5000.0f,
-                       20000.0f + radius * sin(angle));
     terrainShader.use();
-    terrainShader.setVec3("light.position", lightPos);
+    terrainShader.setVec3(
+        "light.direction", -0.1f, -1.0f,
+        -0.1f); // morning: -1.0f, -0.3f, -0.3f afternoon: -0.1f, -1.0f,
+                //-0.1f evening: -1.0f, -0.1f,
+                // 0.0f
     terrainShader.setVec3("viewPos", camera.Position);
 
     terrainShader.setVec3("light.ambient", 0.3f, 0.3f, 0.25f);
@@ -302,17 +166,6 @@ int Application::runApplication(Mesh &mesh) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh.indices.size() * 3, GL_UNSIGNED_INT, 0);
 
-    lampShader.use();
-    lampShader.setMat4("projection", projection);
-    lampShader.setMat4("view", view);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(100.0f));
-    lampShader.setMat4("model", model);
-
-    glBindVertexArray(lampVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -322,8 +175,6 @@ int Application::runApplication(Mesh &mesh) {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
-  glDeleteVertexArrays(1, &lampVAO);
-  glDeleteBuffers(1, &lampVBO);
 
   glfwTerminate();
   return 0;
