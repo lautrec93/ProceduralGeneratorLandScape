@@ -140,8 +140,9 @@ NormalBuilder::windowOption(unsigned size, unsigned index,
     span1 = {&indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) +
                       ((index % NUMBER_OF_NODES_IN_LINE - 1) * 2)],
              3};
-    span2 = {
-        &indices[(index / NUMBER_OF_NODES_IN_LINE - 1) * (unix - 1) + unix], 3};
+    span2 = {&indices[(index / NUMBER_OF_NODES_IN_LINE) * (unix - 1) +
+                      ((index % NUMBER_OF_NODES_IN_LINE - 1) * 2) + 1],
+             3};
     return ranges::views::concat(span1, span2);
   } else {
     std::cout << index << "\n";
