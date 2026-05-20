@@ -7,7 +7,6 @@ class CoordsBuilder {
 private:
   HeightMapContainer &heightMapContainer;
   TerrainConfig terrainConfig;
-  Coord coord;
 
 public:
   Coord coordsCounting(unsigned index);
