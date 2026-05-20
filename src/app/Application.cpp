@@ -20,9 +20,10 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+unsigned loadTexture(const char *path);
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 400;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 Camera camera(glm::vec3(2000.0f, 3000.0f, 8000.0f));
 float lastX = SCR_WIDTH / 2.0f;
@@ -245,6 +246,13 @@ int Application::runApplication(Mesh &mesh) {
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
+  unsigned int diffuseMap =
+      loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+                  "textures/grass-field.jpg");
+
+  terrainShader.use();
+  terrainShader.setInt("material.diffuse", 0.0);
+
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (!glfwWindowShouldClose(window)) {
@@ -258,24 +266,28 @@ int Application::runApplication(Mesh &mesh) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float radius = 3000.0f;
+    float radius = 12000.0f;
     float angle = glfwGetTime() * 0.5f;
 
     glm::vec3 lightPos(20000.0f + radius * cos(angle), 5000.0f,
                        20000.0f + radius * sin(angle));
-
     terrainShader.use();
-    terrainShader.setVec3("objectColor", 0.4, 0.6, 0.3);
-    terrainShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    terrainShader.setVec3("lightPos", lightPos);
+    terrainShader.setVec3("light.position", lightPos);
     terrainShader.setVec3("viewPos", camera.Position);
+
+    terrainShader.setVec3("light.ambient", 0.3f, 0.3f, 0.25f);
+    terrainShader.setVec3("light.diffuse", 0.8f, 0.75f, 0.6f);
+    terrainShader.setVec3("light.specular", 0.5f, 0.5f, 0.5f);
+
+    terrainShader.setVec3("material.specular", 0.05f, 0.07f, 0.03f);
+    terrainShader.setFloat("material.shininess", 4.0f);
 
     glm::mat4 projection =
         glm::perspective(glm::radians(camera.Zoom),
                          (float)SCR_WIDTH / (float)SCR_HEIGHT, 10.0f, 50000.0f);
-    terrainShader.setMat4("projection", projection);
-
     glm::mat4 view = camera.camera_view();
+
+    terrainShader.setMat4("projection", projection);
     terrainShader.setMat4("view", view);
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -283,6 +295,9 @@ int Application::runApplication(Mesh &mesh) {
 
     glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
     terrainShader.setMat3("normalMatrix", normalMatrix);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh.indices.size() * 3, GL_UNSIGNED_INT, 0);
@@ -354,4 +369,39 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   camera.ProcessMouseScroll(yoffset);
+}
+
+unsigned int loadTexture(char const *path) {
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+
+  int width, height, nrComponents;
+  unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+  if (data) {
+    GLenum format;
+    if (nrComponents == 1)
+      format = GL_RED;
+    else if (nrComponents == 3)
+      format = GL_RGB;
+    else if (nrComponents == 4)
+      format = GL_RGBA;
+
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data);
+  } else {
+    std::cout << "Texture failed to load at path: " << path << std::endl;
+    stbi_image_free(data);
+  }
+
+  return textureID;
 }
