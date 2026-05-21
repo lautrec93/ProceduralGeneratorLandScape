@@ -8,6 +8,7 @@ layout(location = 3)in vec4 aColor;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 UVCoords;
+out vec4 SplatWeights;
 
 uniform mat3 normalMatrix;
 uniform mat4 model;
@@ -16,6 +17,7 @@ uniform mat4 projection;
 
 void main(){
     UVCoords = aUV;
+    SplatWeights = aColor;
     FragPos = vec3(model * vec4(aPos,1.0));
     Normal = normalMatrix * aNormal;
     gl_Position = projection * view * vec4(FragPos,1.0);

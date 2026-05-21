@@ -20,7 +20,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-unsigned loadTexture(const char *path);
+unsigned loadTexture(const char *path, bool sRGB);
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -63,6 +63,7 @@ int Application::runApplication(Mesh &mesh) {
   }
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_FRAMEBUFFER_SRGB);
 
   Shader terrainShader(
       "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
@@ -111,12 +112,35 @@ int Application::runApplication(Mesh &mesh) {
                         (void *)(offsetof(Vertices, colour)));
   glEnableVertexAttribArray(3);
 
-  unsigned int diffuseMap =
+  unsigned int grassTex = loadTexture(
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
+      "rocky_terrain_02_4k/textures/rocky_terrain_02_diff_4k.jpg",
+      true);
+  unsigned int rockTex =
       loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-                  "textures/grass-field.jpg");
+                  "textures/mossy_rock_4k/textures/mossy_rock_diff_4k.jpg",
+                  true);
+  unsigned int sandTex = loadTexture(
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
+      "aerial_beach_01_4k/textures/aerial_beach_01_diff_4k.jpg",
+      true);
+  unsigned int snowTex =
+      loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
+                  "textures/snow_02_4k/textures/snow_02_diff_4k.jpg",
+                  true);
+
+  unsigned int swampTex = loadTexture(
+      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
+      "coast_land_rocks_01_4k/textures/coast_land_rocks_01_diff_4k.jpg",
+      true);
 
   terrainShader.use();
   terrainShader.setInt("material.diffuse", 0.0);
+  terrainShader.setInt("grassTex", 0);
+  terrainShader.setInt("rockTex", 1);
+  terrainShader.setInt("snowTex", 2);
+  terrainShader.setInt("sandTex", 3);
+  terrainShader.setInt("swampTex", 4);
 
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -128,8 +152,23 @@ int Application::runApplication(Mesh &mesh) {
 
     processInput(window);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.04f, 0.08f, 0.08f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, grassTex);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, rockTex);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, snowTex);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, sandTex);
+
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, swampTex);
 
     terrainShader.use();
     terrainShader.setVec3(
@@ -139,9 +178,9 @@ int Application::runApplication(Mesh &mesh) {
                 // 0.0f
     terrainShader.setVec3("viewPos", camera.Position);
 
-    terrainShader.setVec3("light.ambient", 0.3f, 0.3f, 0.25f);
-    terrainShader.setVec3("light.diffuse", 0.8f, 0.75f, 0.6f);
-    terrainShader.setVec3("light.specular", 0.5f, 0.5f, 0.5f);
+    terrainShader.setVec3("light.ambient", 0.073f, 0.073f, 0.047f);
+    terrainShader.setVec3("light.diffuse", 0.610f, 0.533f, 0.318f);
+    terrainShader.setVec3("light.specular", 0.218f, 0.218f, 0.218f);
 
     terrainShader.setVec3("material.specular", 0.05f, 0.07f, 0.03f);
     terrainShader.setFloat("material.shininess", 4.0f);
@@ -159,9 +198,6 @@ int Application::runApplication(Mesh &mesh) {
 
     glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
     terrainShader.setMat3("normalMatrix", normalMatrix);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh.indices.size() * 3, GL_UNSIGNED_INT, 0);
@@ -186,7 +222,6 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-
   float cameraSpeed = 2000.0f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     camera.ProcessKeyboard(Camera::Camera_Movement::FORWARD, deltaTime);
@@ -222,23 +257,30 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   camera.ProcessMouseScroll(yoffset);
 }
 
-unsigned int loadTexture(char const *path) {
+unsigned int loadTexture(char const *path, bool sRGB = false) {
   unsigned int textureID;
   glGenTextures(1, &textureID);
 
   int width, height, nrComponents;
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
   if (data) {
     GLenum format;
-    if (nrComponents == 1)
+    GLenum internalFormat;
+
+    if (nrComponents == 1) {
       format = GL_RED;
-    else if (nrComponents == 3)
+      internalFormat = GL_RED;
+    } else if (nrComponents == 3) {
       format = GL_RGB;
-    else if (nrComponents == 4)
+      internalFormat = sRGB ? GL_SRGB : GL_RGB;
+    } else if (nrComponents == 4) {
       format = GL_RGBA;
+      internalFormat = sRGB ? GL_SRGB_ALPHA : GL_RGBA;
+    }
 
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format,
                  GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
