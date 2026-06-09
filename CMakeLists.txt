@@ -84,5 +84,4 @@ endif()
 
 target_compile_definitions(TerrainGen PRIVATE
     OUTPUT_DIR="${CMAKE_BINARY_DIR}"
-    ASSETS_DIR="${CMAKE_SOURCE_DIR}/src/assets"
 )

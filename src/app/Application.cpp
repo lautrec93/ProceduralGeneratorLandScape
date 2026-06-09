@@ -25,6 +25,7 @@
 #include <cstring>
 #include <future>
 #include <iostream>
+#include <mach-o/dyld.h>
 #include <ostream>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -33,6 +34,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 unsigned loadTexture(const char *path, bool sRGB);
 unsigned int loadCubemap(const char *path);
+std::string getAssetsDir();
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -46,6 +48,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int Application::runApplication(Mesh &mesh) {
+  std::string assetsDir = getAssetsDir();
 
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -81,11 +84,11 @@ int Application::runApplication(Mesh &mesh) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
-  Shader terrainShader(ASSETS_DIR "/shaders/terrain.vert",
-                       ASSETS_DIR "/shaders/terrain.frag");
+  Shader terrainShader((assetsDir + "/shaders/terrain.vert").c_str(),
+                       (assetsDir + "/shaders/terrain.frag").c_str());
 
-  Shader skyBoxShader(ASSETS_DIR "/shaders/skybox.vert",
-                      ASSETS_DIR "/shaders/skybox.frag");
+  Shader skyBoxShader((assetsDir + "/shaders/skybox.vert").c_str(),
+                      (assetsDir + "/shaders/skybox.frag").c_str());
 
   float skyboxVertices[] = {
       -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
@@ -148,17 +151,21 @@ int Application::runApplication(Mesh &mesh) {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
   unsigned int cubemapTexture =
-      loadCubemap(ASSETS_DIR "/textures/StandardCubeMap 4.png");
+      loadCubemap((assetsDir + "/textures/StandardCubeMap 4.png").c_str());
 
-  unsigned int grassTex = loadTexture(ASSETS_DIR "/textures/field-7.jpg", true);
-  unsigned int rockTex = loadTexture(ASSETS_DIR "/textures/rocks-10.jpg", true);
+  unsigned int grassTex =
+      loadTexture((assetsDir + "/textures/field-7.jpg").c_str(), true);
+  unsigned int rockTex =
+      loadTexture((assetsDir + "/textures/rocks-10.jpg").c_str(), true);
   unsigned int sandTex = loadTexture(
-      ASSETS_DIR
-      "/textures/aerial_beach_01_4k/textures/aerial_beach_01_diff_4k.jpg",
+      (assetsDir +
+       "/textures/aerial_beach_01_4k/textures/aerial_beach_01_diff_4k.jpg")
+          .c_str(),
       true);
-  unsigned int snowTex = loadTexture(ASSETS_DIR "/textures/snow-1.jpg", true);
-  unsigned int swampTex =
-      loadTexture(ASSETS_DIR "/textures/close-up-forest-moss-cliff.jpg", true);
+  unsigned int snowTex =
+      loadTexture((assetsDir + "/textures/snow-1.jpg").c_str(), true);
+  unsigned int swampTex = loadTexture(
+      (assetsDir + "/textures/close-up-forest-moss-cliff.jpg").c_str(), true);
 
   terrainShader.use();
   terrainShader.setInt("material.diffuse", 0.0);
@@ -471,4 +478,13 @@ unsigned int loadCubemap(const char *path) {
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   return textureID;
+}
+
+std::string getAssetsDir() {
+  char path[1024];
+  uint32_t size = sizeof(path);
+  _NSGetExecutablePath(path, &size);
+  std::string exePath(path);
+  auto dir = exePath.substr(0, exePath.rfind('/'));
+  return dir + "/../assets";
 }
