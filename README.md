@@ -63,6 +63,9 @@ To build a portable `.app`:
 ```bash
 ./bundle.sh
 ```
+## Download
+
+See [Releases](../../releases) for a prebuilt macOS binary.
 
 ## Running on macOS
 
@@ -79,7 +82,3 @@ xattr -cr TerrainGen.app
 Or right-click `TerrainGen.app` in Finder → Open → Open.
 
 Output: `TerrainGen.app` — runs without Homebrew installed.
-
-## Download
-
-See [Releases](../../releases) for a prebuilt macOS binary.
