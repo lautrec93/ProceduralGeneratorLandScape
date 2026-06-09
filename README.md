@@ -64,6 +64,20 @@ To build a portable `.app`:
 ./bundle.sh
 ```
 
+## Running on macOS
+
+Download `TerrainGen-macos.zip` from [Releases](../../releases), unzip, then:
+
+```bash
+# Remove quarantine flag (required for unsigned apps)
+xattr -cr TerrainGen.app
+
+# Run
+./TerrainGen.app/Contents/MacOS/TerrainGen
+```
+
+Or right-click `TerrainGen.app` in Finder → Open → Open.
+
 Output: `TerrainGen.app` — runs without Homebrew installed.
 
 ## Download
