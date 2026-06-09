@@ -1,8 +1,6 @@
 #include "generator/HeightMap/HeightMapBuilder.hpp"
 #include "generator/Instruments/Globals.hpp"
-#include "generator/Noise/PerlinNoise.hpp"
 #include <cmath>
-#include <cstdio>
 void HeightMapBuilder::heightMapBuilder() {
   heightMapContainer.heightMapResize(std::pow(NUMBER_OF_NODES_IN_LINE, 2));
 #pragma omp parallel for collapse(2) schedule(static)

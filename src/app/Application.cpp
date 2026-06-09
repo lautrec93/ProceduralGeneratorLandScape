@@ -8,11 +8,13 @@
 
 #include "app/Application.hpp"
 #include "generator/MeshF/Mesh.hpp"
+#include "glm/detail/type_mat.hpp"
 #include "render/Camera.hpp"
 #include "render/Shader.hpp"
 
 #include "stb_image.h"
 #include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <ostream>
 
@@ -21,6 +23,7 @@ void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 unsigned loadTexture(const char *path, bool sRGB);
+unsigned int loadCubemap(const char *path);
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -54,7 +57,6 @@ int Application::runApplication(Mesh &mesh) {
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetScrollCallback(window, scroll_callback);
 
-  // Захват курсора
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -65,17 +67,30 @@ int Application::runApplication(Mesh &mesh) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
-  Shader terrainShader(
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-      "shaders/terrain.vert",
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-      "shaders/terrain.frag");
+  Shader terrainShader(ASSETS_DIR "/shaders/terrain.vert",
+                       ASSETS_DIR "/shaders/terrain.frag");
 
-  Shader lampShader(
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-      "shaders/lamp.vert",
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-      "shaders/lamp.frag");
+  Shader skyBoxShader(ASSETS_DIR "/shaders/skybox.vert",
+                      ASSETS_DIR "/shaders/skybox.frag");
+
+  float skyboxVertices[] = {
+      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
   unsigned int VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO);
@@ -92,47 +107,44 @@ int Application::runApplication(Mesh &mesh) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices) * mesh.indices.size(),
                mesh.indices.data(), GL_STATIC_DRAW);
 
-  // Атрибут позиции
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertices),
                         (void *)offsetof(Vertices, coord));
   glEnableVertexAttribArray(0);
 
-  // Атрибут нормали
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertices),
                         (void *)(offsetof(Vertices, normal)));
   glEnableVertexAttribArray(1);
 
-  // Атрибут UV
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertices),
                         (void *)(offsetof(Vertices, uv)));
   glEnableVertexAttribArray(2);
 
-  // Атрибут цвета/текстуры
   glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertices),
                         (void *)(offsetof(Vertices, colour)));
   glEnableVertexAttribArray(3);
 
-  unsigned int grassTex = loadTexture(
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
-      "rocky_terrain_02_4k/textures/rocky_terrain_02_diff_4k.jpg",
-      true);
-  unsigned int rockTex =
-      loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-                  "textures/mossy_rock_4k/textures/mossy_rock_diff_4k.jpg",
-                  true);
-  unsigned int sandTex = loadTexture(
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
-      "aerial_beach_01_4k/textures/aerial_beach_01_diff_4k.jpg",
-      true);
-  unsigned int snowTex =
-      loadTexture("/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/"
-                  "textures/snow_02_4k/textures/snow_02_diff_4k.jpg",
-                  true);
+  unsigned int skyboxVAO, skyboxVBO;
+  glGenVertexArrays(1, &skyboxVAO);
+  glGenBuffers(1, &skyboxVBO);
+  glBindVertexArray(skyboxVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices,
+               GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
-  unsigned int swampTex = loadTexture(
-      "/Users/arsenikarokhin/VSCodeProjects/TerrainGen/src/assets/textures/"
-      "coast_land_rocks_01_4k/textures/coast_land_rocks_01_diff_4k.jpg",
+  unsigned int cubemapTexture =
+      loadCubemap(ASSETS_DIR "/textures/StandardCubeMap 4.png");
+
+  unsigned int grassTex = loadTexture(ASSETS_DIR "/textures/field-7.jpg", true);
+  unsigned int rockTex = loadTexture(ASSETS_DIR "/textures/rocks-10.jpg", true);
+  unsigned int sandTex = loadTexture(
+      ASSETS_DIR
+      "/textures/aerial_beach_01_4k/textures/aerial_beach_01_diff_4k.jpg",
       true);
+  unsigned int snowTex = loadTexture(ASSETS_DIR "/textures/snow-1.jpg", true);
+  unsigned int swampTex =
+      loadTexture(ASSETS_DIR "/textures/close-up-forest-moss-cliff.jpg", true);
 
   terrainShader.use();
   terrainShader.setInt("material.diffuse", 0.0);
@@ -142,7 +154,8 @@ int Application::runApplication(Mesh &mesh) {
   terrainShader.setInt("sandTex", 3);
   terrainShader.setInt("swampTex", 4);
 
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  skyBoxShader.use();
+  skyBoxShader.setInt("skybox", 0);
 
   while (!glfwWindowShouldClose(window)) {
     glDisable(GL_CULL_FACE);
@@ -202,6 +215,19 @@ int Application::runApplication(Mesh &mesh) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh.indices.size() * 3, GL_UNSIGNED_INT, 0);
 
+    glDepthFunc(GL_LEQUAL);
+    skyBoxShader.use();
+    view = glm::mat4(glm::mat3(camera.camera_view()));
+    skyBoxShader.setMat4("view", view);
+    skyBoxShader.setMat4("projection", projection);
+
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -211,6 +237,8 @@ int Application::runApplication(Mesh &mesh) {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
+  glDeleteVertexArrays(1, &skyboxVAO);
+  glDeleteBuffers(1, &skyboxVBO);
 
   glfwTerminate();
   return 0;
@@ -295,6 +323,62 @@ unsigned int loadTexture(char const *path, bool sRGB = false) {
     std::cout << "Texture failed to load at path: " << path << std::endl;
     stbi_image_free(data);
   }
+
+  return textureID;
+}
+
+unsigned int loadCubemap(const char *path) {
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+  stbi_set_flip_vertically_on_load(false);
+
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+  if (!data) {
+    std::cout << "Cross cubemap failed to load: " << path << std::endl;
+    return textureID;
+  }
+
+  int faceW = width / 4;
+  int faceH = height / 3;
+
+  struct FaceLoc {
+    int col, row;
+  };
+  FaceLoc faces[6] = {
+      {2, 1}, {0, 1}, {1, 0}, {1, 2}, {1, 1}, {3, 1},
+  };
+
+  GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+  GLenum internalFormat = (nrChannels == 4) ? GL_SRGB_ALPHA : GL_SRGB;
+
+  std::vector<unsigned char> faceData(faceW * faceH * nrChannels);
+
+  for (int i = 0; i < 6; i++) {
+    int xOff = faces[i].col * faceW;
+    int yOff = faces[i].row * faceH;
+
+    for (int y = 0; y < faceH; y++) {
+      unsigned char *srcRow =
+          data + ((size_t)(yOff + y) * width + xOff) * nrChannels;
+      unsigned char *dstRow =
+          faceData.data() + (size_t)(y * faceW) * nrChannels;
+      std::memcpy(dstRow, srcRow, (size_t)faceW * nrChannels);
+    }
+
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, faceW,
+                 faceH, 0, format, GL_UNSIGNED_BYTE, faceData.data());
+  }
+
+  stbi_image_free(data);
+
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   return textureID;
 }

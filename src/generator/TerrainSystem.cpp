@@ -30,9 +30,6 @@ void TerrainSystem::runTerrainSystem(Mesh &mesh) {
                                         fractalBrownianMotion, perlinNoise,
                                         postProcessor, inputValues[0]);
   heightMapMainBuilder.heightMapBuilder();
-
-  // heightMapMainContainer.showMap();
-  heightMapMainContainer.showMid();
   saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
 
   CoordsBuilder coordsBuilder(heightMapMainContainer, inputValues[0]);

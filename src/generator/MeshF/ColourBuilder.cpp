@@ -5,8 +5,11 @@
 #include <cmath>
 
 double ColourBuilder::rChanalCounter(Normal &normal) {
-  return pow(1.0 - std::__math::abs(normal.y), 2);
+  double slope = 1.0 - std::abs(normal.y);
+  double t = (slope - 0.15) / (0.55 - 0.15);
+  return std::clamp(t, 0.0, 1.0);
 }
+
 double ColourBuilder::gChanalCounter(double height, double min, double max) {
   return pow((height - min) / (max - min), 2);
 }

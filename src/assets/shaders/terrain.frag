@@ -23,10 +23,6 @@ uniform sampler2D sandTex;
 uniform sampler2D snowTex;
 uniform sampler2D swampTex;
 
-/*void main() {
-    FragColor = vec4(SplatWeights.rgb, 1.0);
-}*/
-
 void main(){
 
     vec2 uv = FragPos.xz * 0.05;
@@ -39,8 +35,8 @@ void main(){
 
     vec3 albedo = mix(grass, swamp, SplatWeights.a);
     albedo = mix(sand, albedo, SplatWeights.b);
-    albedo = mix(albedo, snow, SplatWeights.g);
     albedo = mix(albedo, rock, SplatWeights.r);
+    albedo = mix(albedo, snow, SplatWeights.g);
 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(-light.direction);

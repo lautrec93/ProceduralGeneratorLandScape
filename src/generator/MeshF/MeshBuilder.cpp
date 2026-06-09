@@ -3,7 +3,6 @@
 #include <iostream>
 
 void MeshBuilder::meshBuild() {
-  std::cout << "NODES: " << NUMBER_OF_NODES_IN_LINE << "\n";
   for (unsigned i{0}; i <= (std::__math::pow(NUMBER_OF_NODES_IN_LINE, 2) - 1) -
                                (NUMBER_OF_NODES_IN_LINE + 1);
        ++i) {

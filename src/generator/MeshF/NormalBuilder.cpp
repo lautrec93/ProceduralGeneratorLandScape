@@ -8,10 +8,7 @@
 #include <span>
 #include <vector>
 
-Normal NormalBuilder::normalSummation(
-    unsigned index) { // тут мы принимаем индекс конкретной вершины, возвращаем
-                      // нормаль для каждого ее треуголльника и суммируем их +
-                      // нормализуем
+Normal NormalBuilder::normalSummation(unsigned index) {
 
   Normal finalNormal{};
   auto window = windowOption(mesh.indices.size(), index, mesh.indices);
@@ -20,31 +17,14 @@ Normal NormalBuilder::normalSummation(
     finalNormal += (normalProcessing(triangle));
   }
 
-  /*auto window = windowOption(mesh.indices.size(), index, mesh.indices) |
-                ranges::to<std::vector<Indices>>();
-
-  #pragma omp parallel
-    {
-      Normal localNormal{.x = 0.0f, .z = 0.0f, .y = 0.0f};
-
-  #pragma omp for
-      for (int i = 0; i < (int)window.size(); i++)
-        localNormal += normalProcessing(window[i]);
-
-  #pragma omp critical
-      finalNormal += localNormal;
-    }*/
-
   float normalLength = std::hypot(finalNormal.x, finalNormal.y, finalNormal.z);
   finalNormal = {finalNormal.x / normalLength, finalNormal.y / normalLength,
                  finalNormal.z / normalLength};
   return finalNormal;
 }
 
-Normal NormalBuilder::normalProcessing(
-    const Indices &triangle) { // тут берем треугольник по адресу и для него
-                               // считаем координаты, угол, нормаль и возвращаем
-                               // отскейленную, готовую к суммированию нормаль
+Normal NormalBuilder::normalProcessing(const Indices &triangle) {
+
   Coord currentCoordA = coordBuilder.coordsCounting(triangle.a);
   Coord currentCoordB = coordBuilder.coordsCounting(triangle.b);
   Coord currentCoordC = coordBuilder.coordsCounting(triangle.c);
