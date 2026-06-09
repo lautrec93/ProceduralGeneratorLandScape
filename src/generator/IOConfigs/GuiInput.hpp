@@ -1,21 +1,20 @@
 #pragma once
 #include "generator/IOConfigs/TerrainConfig.hpp"
-#include <string>
 
 class GuiInput {
 public:
-  int size = 512;
-  float cellSize = 1.0f;
-  float noizeScale = 1.0f;
-  float baseAmplitude = 50.0f;
-  float baseFrequency = 1.0f;
+  int size = 40000;
+  float cellSize = 10.0f;
+  float noizeScale = 0.05f;
+  float baseAmplitude = 1.0f;
+  float baseFrequency = 0.01f;
   float lacunarity = 2.0f;
   float persistence = 0.5f;
-  float coefficient = 1.0f;
-  int octaveNumber = 6;
-  float minHeight = 0.0f;
-  float maxHeight = 100.0f;
-  float seaLevel = 20.0f;
+  float coefficient = 2.5f;
+  int octaveNumber = 8;
+  float minHeight = -1000.0f;
+  float maxHeight = 4000.0f;
+  float seaLevel = 5.0f;
   char seedInput[256] = "myseed";
 
   bool ready = false;

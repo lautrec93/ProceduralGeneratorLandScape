@@ -6,26 +6,34 @@
 #include <string>
 
 bool GuiInput::drawMenu() {
-  ImGui::SetNextWindowPos({50, 50}, ImGuiCond_Once);
-  ImGui::SetNextWindowSize({420, 560}, ImGuiCond_Once);
-  ImGui::Begin("Terrain Parameters");
+  ImGui::Begin("Terrain Parameters", nullptr,
+               ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-  ImGui::InputInt("Field size", &size);
-  ImGui::InputFloat("Cell size", &cellSize);
-  ImGui::InputFloat("Noise scale", &noizeScale);
-  ImGui::InputFloat("Amplitude", &baseAmplitude);
-  ImGui::InputFloat("Frequency", &baseFrequency);
-  ImGui::InputFloat("Lacunarity", &lacunarity);
-  ImGui::InputFloat("Persistence", &persistence);
-  ImGui::InputFloat("Coefficient", &coefficient);
-  ImGui::InputInt("Octaves", &octaveNumber);
-  ImGui::InputFloat("Min height", &minHeight);
-  ImGui::InputFloat("Max height", &maxHeight);
-  ImGui::InputFloat("Sea level", &seaLevel);
+  ImGui::InputInt("Field size", &size, 1);
+  ImGui::InputFloat("Cell size", &cellSize, 1);
+  ImGui::InputFloat("Noise scale", &noizeScale, 0.01f);
+  ImGui::InputFloat("Amplitude", &baseAmplitude, 0.01f);
+  ImGui::InputFloat("Frequency", &baseFrequency, 0.01f);
+  ImGui::InputFloat("Lacunarity", &lacunarity, 0.01f);
+  ImGui::InputFloat("Persistence", &persistence, 0.01f);
+  ImGui::InputFloat("Coefficient", &coefficient, 0.01f);
+  ImGui::InputInt("Octaves", &octaveNumber, 1);
+  ImGui::InputFloat("Min height", &minHeight, 0.1f);
+  ImGui::InputFloat("Max height", &maxHeight, 0.1f);
+  ImGui::InputFloat("Sea level", &seaLevel, 0.1f);
   ImGui::InputText("Seed", seedInput, sizeof(seedInput));
 
   ImGui::Spacing();
-  bool clicked = ImGui::Button("Generate", {200, 40});
+  bool clicked = ImGui::Button("Generate", {380, 40});
+
+  ImGui::Spacing();
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.1f, 0.1f, 1.0f));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+  if (ImGui::Button("Exit", {380, 35})) {
+    exit(0);
+  }
+  ImGui::PopStyleColor(2);
+
   ImGui::End();
   return clicked;
 }

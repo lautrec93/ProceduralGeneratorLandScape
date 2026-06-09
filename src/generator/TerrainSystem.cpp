@@ -1,10 +1,8 @@
 #include "generator/TerrainSystem.hpp"
 #include "generator/HeightMap/HeightMapBuilder.hpp"
 #include "generator/HeightMap/HeightMapContainer.hpp"
-#include "generator/IOConfigs/Input.hpp"
 #include "generator/IOConfigs/TerrainConfig.hpp"
 #include "generator/Instruments/Globals.hpp"
-#include "generator/Instruments/SaveJSON.hpp"
 #include "generator/MeshF/CoordsBuilder.hpp"
 #include "generator/MeshF/Mesh.hpp"
 #include "generator/MeshF/MeshBuilder.hpp"
@@ -14,31 +12,37 @@
 #include "generator/Noise/PerlinNoise.hpp"
 #include "generator/Noise/PostProcessor.hpp"
 #include <cctype>
-#include <string>
-#include <vector>
 
-void TerrainSystem::runTerrainSystem(Mesh &mesh) {
-  Input input;
-  auto inputValues = input.startInput();
+void TerrainSystem::runTerrainSystem(const TerrainConfig &config, Mesh &mesh,
+                                     std::atomic<float> &progress) {
 
-  NUMBER_OF_NODES_IN_LINE = inputValues[0].size / inputValues[0].cellSize;
+  progress = 0.05f;
+  NUMBER_OF_NODES_IN_LINE = config.size / config.cellSize;
   HeightMapContainer heightMapMainContainer;
-  PerlinNoise perlinNoise(inputValues[0]);
+  PerlinNoise perlinNoise(config);
   FractalBrownianMotion fractalBrownianMotion(perlinNoise);
   PostProcessor postProcessor(heightMapMainContainer);
   HeightMapBuilder heightMapMainBuilder(heightMapMainContainer,
                                         fractalBrownianMotion, perlinNoise,
-                                        postProcessor, inputValues[0]);
-  heightMapMainBuilder.heightMapBuilder();
-  saveJSON(heightMapMainContainer.getHeightMap(), "heightmap.json");
+                                        postProcessor, config);
 
-  CoordsBuilder coordsBuilder(heightMapMainContainer, inputValues[0]);
+  progress = 0.15f;
+
+  heightMapMainBuilder.heightMapBuilder();
+  progress = 0.65f;
+
+  CoordsBuilder coordsBuilder(heightMapMainContainer, config);
   SingleAngleNormalHandler sANH;
   NormalBuilder normalBuilder(mesh, coordsBuilder, sANH);
-  UVBuilder uvBuilder(inputValues[0]);
+  UVBuilder uvBuilder(config);
   ColourBuilder colourBuilder(perlinNoise);
-  VerticesBuilder verticesBuilder(inputValues[0], coordsBuilder, normalBuilder,
+  progress = 0.87f;
+
+  VerticesBuilder verticesBuilder(config, coordsBuilder, normalBuilder,
                                   uvBuilder, colourBuilder);
+  progress = 0.93f;
+
   MeshBuilder meshBuilder(mesh, verticesBuilder);
   meshBuilder.meshBuild();
+  progress = 1.0f;
 }
