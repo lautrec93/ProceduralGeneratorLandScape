@@ -2,6 +2,7 @@
 
 Procedural 3D terrain generator built with C++ and OpenGL.
 
+![render1](docs/screenshots/render0.png)
 ![render1](docs/screenshots/render1.png)
 ![render2](docs/screenshots/render2.png)
 ![render3](docs/screenshots/render3.png)
