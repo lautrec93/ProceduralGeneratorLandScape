@@ -257,6 +257,8 @@ int Application::runApplication(Mesh &mesh) {
       if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         state = AppState::MENU;
         firstMouse = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPos(window, winW / 2.0, winH / 2.0);
       } else {
         processInput(window);
 
