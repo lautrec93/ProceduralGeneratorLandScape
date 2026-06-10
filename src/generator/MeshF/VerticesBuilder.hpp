@@ -7,7 +7,6 @@
 class VerticesBuilder {
 private:
   TerrainConfig terrainConfig;
-  Vertices vertex;
   CoordsBuilder coordBuilder;
   NormalBuilder normalBuilder;
   UVBuilder uvBuilder;
